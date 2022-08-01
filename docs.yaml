@@ -1,0 +1,796 @@
+---
+openapi: 3.0.3
+info:
+  description: "API documentation for OCRA project"
+  version: "1.0.0"
+  title: "OCRA Project"
+  contact:
+    email: "neojarmawijaya@gmail.com"
+
+servers:
+  - url : "https://ocra-server.herokuapp.com/api/v1"
+
+externalDocs:
+  description: "Website Link"
+  url: "http://swagger.io"
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session_id
+
+paths:
+  /auth/login:
+    post:
+      tags:
+      - "Authentication"
+      summary: "Logs user into the system"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              required:
+                - "email"
+                - "password"
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          headers:
+            session_id:
+              schema:
+                type: string
+            expires_at:
+              schema:
+                type: number
+          description: success login response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                      isHasChannel:
+                        type: boolean
+                      channel:
+                        type: object
+                        properties:
+                          channelId:
+                            type: string
+        "401":
+          description: wrong credential 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+        "400":
+          description: bad request 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /auth/logout:
+    post:
+      security:
+        - cookieAuth: []
+      tags:
+      - "Authentication"
+      summary: "Logs out current logged in user session"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - "userId"
+              properties:
+                userId:
+                  type: string
+      responses:
+        "200":
+          description: success logout response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /register:
+    "post":
+      tags:
+        - "Register"
+      summary: "Register user"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              required:
+                - "email"
+                - "password"
+                - "fullName"
+              properties:
+                fullName:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "201":
+          description: success register response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                      email:
+                        type: string
+                      fullName:
+                        type: string
+                      createdAt:
+                        type: string
+        "409":
+          description: email already exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /user/{id}:
+    patch:
+      security:
+        - cookieAuth: []
+      tags:
+        - "User"
+      summary: "Update current user data"
+      parameters:
+        - in: path
+          name: "id"
+          description: "user id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileName:
+                  type: string
+                  format: binary
+                fullName:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: success update data response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      fullName:
+                        type: string
+                      email:
+                        type: string
+                      userProfileImage:
+                        type: string
+        "404":
+          description: user id not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /channel/{id}:
+    get:
+      security:
+        - cookieAuth: []
+      tags:
+        - "Channel"
+      summary: "Get detail channel"
+      parameters:
+        - in: path
+          name: "id"
+          description: "channel id"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: success get detail channel
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      channelName:
+                        type: string
+                      channelProfileImage:
+                        type: string
+                      channelBannerImage:
+                        type: string
+                      videos:
+                        type: array
+                        description: "10 videos"
+                        items:
+                          type: object
+                          properties:
+                            videoId:
+                              type: string
+                            title:
+                              type: string
+                            videos:
+                              type: string
+                            thumbnail:
+                              type: string
+                            description:
+                              type: string
+                            tags:
+                              type: string
+                            createdAt:
+                              type: number
+                            likesCount:
+                              type: number
+                            dislikesCount:
+                              type: number
+                            viewsCount:
+                              type: number
+
+        "404":
+          description: channel id not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+    post:
+      security:
+        - cookieAuth: []
+      tags:
+        - "Channel"
+      summary: "Create new channel"
+      parameters:
+        - in: path
+          name: "id"
+          description: "user id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - "channelName"
+              properties:
+                channelProfileImage:
+                  type: string
+                  format: binary
+                channelName:
+                  type: string
+      responses:
+        "200":
+          description: success create channel response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      channelId:
+                        type: string
+                      channelName:
+                        type: string
+                      channelProfileImage:
+                        type: string
+                      createdAt:
+                        type: string
+        "404":
+          description: user id not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+    patch:
+      security:
+        - cookieAuth: []
+      tags:
+        - "Channel"
+      summary: "Update current channel data"
+      parameters:
+        - in: path
+          name: "id"
+          description: "channel id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                channelProfileImage:
+                  type: string
+                  format: binary
+                channelBannerImage:
+                  type: string
+                  format: binary
+                channelName:
+                  type: string
+      responses:
+        "200":
+          description: success update channel response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      channelId:
+                        type: string
+                      channelName:
+                        type: string
+                      channelProfileImage:
+                        type: string
+        "404":
+          description: channel id not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /channel/{id}/videos:
+    get:
+      tags:
+        - "Channel Videos"
+      summary: "get all in video in channel"
+      parameters:
+        - in: path
+          name: "id"
+          description: "channel id"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: success get all video
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        videoId:
+                          type: string
+                        title:
+                          type: string
+                        videos:
+                          type: string
+                        thumbnail:
+                          type: string
+                        description:
+                          type: string
+                        tags:
+                          type: string
+                        createdAt:
+                          type: number
+                        likesCount:
+                          type: number
+                        dislikesCount:
+                          type: number
+                        viewsCount:
+                          type: number
+        "404":
+          description: channel id not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+    post:
+      security:
+        - cookieAuth: []
+      tags:
+        - "Channel Videos"
+      summary: "Create new video"
+      parameters:
+        - in: path
+          name: "id"
+          description: "channel id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - "channelName"
+              properties:
+                title:
+                  type: string
+                videos:
+                  type: string
+                  format: binary
+                thumbnail:
+                  type: string
+                  format: binary
+                description:
+                  type: string
+                tags:
+                  type: string
+      responses:
+        "201":
+          description: success create video
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      videos:
+                        type: string
+                      thumbnail:
+                        type: string
+                      description:
+                        type: string
+                      tags:
+                        type: string
+                      createdAt:
+                        type: number
+        "404":
+          description: channel id not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /video/{id}:
+    get:
+      tags:
+        - "Videos"
+      summary: "get detail video"
+      parameters:
+        - in: path
+          name: "id"
+          description: "video id"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: success get all video
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      channelId:
+                        type: string
+                      videoId:
+                        type: string
+                      title:
+                        type: string
+                      videos:
+                        type: string
+                      thumbnail:
+                        type: string
+                      description:
+                        type: string
+                      tags:
+                        type: string
+                      createdAt:
+                        type: number
+                      likesCount:
+                        type: number
+                      dislikesCount:
+                        type: number
+                      viewsCount:
+                        type: number
+                      
+        "404":
+          description: channel id not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object  
+  /channel/subs/{id}:
+    post:
+      tags:
+        - "Channel"
+      summary: "Subscribe to channel"
+      parameters:
+        - in: path
+          name: "id"
+          description: "channel id"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+      responses:
+        "200":
+          description: success subscribe channel
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+        "404":
+          description: channel id not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /videos:
+    get:
+      tags:
+        - "Videos"
+      summary: "get all videos from all channel"
+      description: "Pagination limit 8"
+      responses:
+        "200":
+          description: success get all video
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      channelId:
+                        type: string
+                      channelName:  
+                        type: string
+                      channelProfileImage:
+                        type: string
+                      videoId:
+                        type: string
+                      title:
+                        type: string
+                      videos:
+                        type: string
+                      thumbnail:
+                        type: string
+                      description:
+                        type: string
+                      tags:
+                        type: string
+                      createdAt:
+                        type: number
+                      likesCount:
+                        type: number
+                      dislikesCount:
+                        type: number
+                      viewsCount:
+                        type: number
+  /video/like/{id}:
+    post:
+      tags:
+        - "Videos"
+      summary: "like some video"
+      responses:
+        "200":
+          description: success like video
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /video/dislike/{id}:
+    post:
+      tags:
+        - "Videos"
+      summary: "dislike some video"
+      responses:
+        "200":
+          description: success dislike video
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    
