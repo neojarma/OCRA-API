@@ -6,4 +6,5 @@ type UserResponse struct {
 	UserProfileImage *string `json:"userProfileImage"`
 	Email            string  `json:"email"`
 	CreatedAt        string  `json:"createdAt"`
+	ChannelId        *string `json:"channelId"`
 }

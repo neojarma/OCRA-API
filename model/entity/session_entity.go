@@ -3,6 +3,6 @@ package entity
 type Sessions struct {
 	SessionId string
 	UserId    string
-	CreatedAt uint64
-	ExpiresAt uint64
+	CreatedAt int64
+	ExpiresAt int64
 }

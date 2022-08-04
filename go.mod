@@ -2,7 +2,12 @@ module ocra_server
 
 go 1.18
 
-require gorm.io/driver/postgres v1.3.8
+require (
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
+)
 
 require (
 	github.com/go-playground/locales v0.14.0 // indirect
@@ -31,5 +36,6 @@ require (
 	golang.org/x/sys v0.0.0-20211103235746-7861aae1554b // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
+	gorm.io/driver/mysql v1.3.5
 	gorm.io/gorm v1.23.8 // indirect
 )
