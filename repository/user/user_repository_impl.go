@@ -75,7 +75,7 @@ func (repository *userRepositoryImpl) CreateUser(user *entity.Users) error {
 
 func (repository *userRepositoryImpl) DetailUser(user *entity.Users) (*joins_model.UserChannelJoin, error) {
 	result := new(joins_model.UserChannelJoin)
-	err := repository.Db.Model(user).Select("users.user_id", "users.full_name", "users.profile_image", "users.email", "users.created_at").Joins("LEFT JOIN channels on users.user_id = channels.user_id").Where("users.email = ?", user.Email).Find(result).Error
+	err := repository.Db.Model(user).Select("users.user_id", "users.full_name", "users.profile_image", "users.email", "users.created_at", "channels.channel_id").Joins("LEFT JOIN channels on users.user_id = channels.user_id").Where("users.email = ?", user.Email).Find(result).Error
 	if err != nil {
 		return nil, err
 	}
