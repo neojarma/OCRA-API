@@ -43,8 +43,11 @@ func (controller *UserControllerImpl) Login(ctx echo.Context) error {
 		})
 	}
 
-	cookieService := cookie_service.NewCookieService().CreateCookie("session-id", result.SessionId, time.Now().Add(72*time.Hour))
+	cookieService := cookie_service.NewCookieService().CreateCookie("session-id", *result.SessionId, time.Now().Add(72*time.Hour))
 	ctx.SetCookie(cookieService)
+
+	// unset session-id in json
+	result.SessionId = nil
 
 	return ctx.JSON(http.StatusOK, &response.Response{
 		Status:  response.StatusSuccess,

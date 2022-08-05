@@ -7,5 +7,5 @@ type UserChannelJoin struct {
 	Email        string  `json:"email"`
 	CreatedAt    int64   `json:"createdAt"`
 	ChannelId    *string `json:"channelId"`
-	SessionId    string  `json:"sessionId,omitempty"`
+	SessionId    *string `json:"sessionId,omitempty"`
 }

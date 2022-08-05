@@ -62,7 +62,7 @@ func (service *UserServiceImpl) ValidateLogin(reqUser *request.UserRequest) (*jo
 		return nil, err
 	}
 
-	result.SessionId = sessionId
+	result.SessionId = &sessionId
 
 	return result, nil
 }
