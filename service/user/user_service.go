@@ -7,7 +7,7 @@ import (
 )
 
 type UserService interface {
-	ValidateLogin(reqUser *request.UserRequest) (*joins_model.UserChannelJoin, error)
+	ValidateLogin(reqUser *request.AuthRequest) (*joins_model.UserChannelJoin, error)
 	Register(reqUser *request.UserRequest) (*response.UserResponse, error)
 	Logout(sessionId string) error
 	GetDetailUser(reqUser *request.UserRequest) (*joins_model.UserChannelJoin, error)

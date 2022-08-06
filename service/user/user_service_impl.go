@@ -38,7 +38,7 @@ func (service *UserServiceImpl) Logout(sessionId string) error {
 	return service.SessionService.DeleteSession(sessionId)
 }
 
-func (service *UserServiceImpl) ValidateLogin(reqUser *request.UserRequest) (*joins_model.UserChannelJoin, error) {
+func (service *UserServiceImpl) ValidateLogin(reqUser *request.AuthRequest) (*joins_model.UserChannelJoin, error) {
 	domainReq := &entity.Users{
 		Email:    reqUser.Email,
 		Password: reqUser.Password,

@@ -2,6 +2,7 @@ package user_controller
 
 import (
 	"net/http"
+	"ocra_server/helper"
 	"ocra_server/model/request"
 	"ocra_server/model/response"
 	cookie_service "ocra_server/service/cookie"
@@ -32,8 +33,22 @@ func NewUserController(service user_service.UserService, cookieService cookie_se
 }
 
 func (controller *UserControllerImpl) Login(ctx echo.Context) error {
-	req := new(request.UserRequest)
+	req := new(request.AuthRequest)
 	ctx.Bind(req)
+
+	if err := helper.ValidateUserInput(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, &response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
+
+	if err := helper.ValidateUserInput(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, &response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
 
 	result, err := controller.Service.ValidateLogin(req)
 	if err != nil {
@@ -86,6 +101,14 @@ func (controller *UserControllerImpl) Logout(ctx echo.Context) error {
 func (controller *UserControllerImpl) Register(ctx echo.Context) error {
 	req := new(request.UserRequest)
 	ctx.Bind(req)
+
+	if err := helper.ValidateUserInput(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, &response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
+
 	result, err := controller.Service.Register(req)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, &response.EmptyObjectDataResponse{

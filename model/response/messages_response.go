@@ -31,3 +31,6 @@ const MessageInvalidSession = "invalid session"
 const MessageSuccessRenewSession = "success renew session"
 const MessageMissingSessionId = "missing session id"
 const MessageSuccessLogout = "success logout"
+
+// validate input
+const MessageInvalidJsonInput = "invalid value or missing property in body request"
