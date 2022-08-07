@@ -17,6 +17,7 @@ const MessageFailedRegisterEmailExist = "email already exist"
 // verify email
 const MessageSuccessVerifyEmail = "success verify user email"
 const MessageFailedVerifyEmail = "verification token is either expired or invalid"
+const MessageUserIsAlreadyVerified = "user is already verified"
 
 // not authenticated
 const MessageMissingAuthToken = "missing auth token"

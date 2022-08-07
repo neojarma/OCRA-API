@@ -29,9 +29,15 @@ func NewVerificationRepository(db *gorm.DB) VerificationRepository {
 
 func (repo *VerificationRepositoryImpl) VerifiedUserEmail(request *entity.Verifications) error {
 	now := time.Now().UnixMilli()
-	isValidToken := repo.Db.Where("token = ?", request.Token).Where("expires_at >= ?", now).First(request).RowsAffected == 1
+	result := repo.Db.Where("token = ?", request.Token).First(request)
 
-	if !isValidToken {
+	isAlreadyVerified := result.RowsAffected == 0
+	if isAlreadyVerified {
+		return errors.New(response.MessageUserIsAlreadyVerified)
+	}
+
+	needToResendCode := request.ExpiresAt < now
+	if needToResendCode {
 		return errors.New(response.MessageFailedVerifyEmail)
 	}
 
