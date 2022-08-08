@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gopkg.in/gomail.v2"
 )
 
@@ -33,6 +34,11 @@ func main() {
 	}
 
 	group := app.Group("/api/v1")
+
+	group.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowCredentials: true,
+		AllowOrigins:     []string{"https://web.ocra.neojarma.com"},
+	}))
 
 	router.Router(group, db, dialer)
 
