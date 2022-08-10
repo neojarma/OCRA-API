@@ -35,3 +35,8 @@ const MessageSuccessLogout = "success logout"
 
 // validate input
 const MessageInvalidJsonInput = "invalid value or missing property in body request"
+
+// videos
+const MessageInvalidParameter = "invalid query parameter"
+const MessageSuccesGetAllVideos = "success get all videos"
+const MessageSuccesGetVideo = "success get video data"
