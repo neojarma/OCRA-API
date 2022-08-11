@@ -42,14 +42,14 @@ func (service *SessionServiceImpl) CheckActiveSession(sessionId string) (*entity
 		}, nil
 	}
 
-	userId, err := service.Repo.CheckActiveSession(&entity.Sessions{SessionId: sessionId})
+	session, err := service.Repo.CheckActiveSession(&entity.Sessions{SessionId: sessionId})
 	if err != nil {
 		return nil, err
 	}
 
-	service.SessionCache.Set(sessionId, userId, cache.DefaultExpiration)
+	service.SessionCache.Set(sessionId, session.UserId, cache.DefaultExpiration)
 
-	return userId, nil
+	return session, nil
 }
 
 func (service *SessionServiceImpl) CreateNewSession(userId string) (string, error) {

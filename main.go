@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"ocra_server/connection"
 	"ocra_server/router"
+	firebase_service "ocra_server/service/firebase"
 	"os"
 	"strconv"
 
@@ -26,12 +28,17 @@ func main() {
 		panic(err)
 	}
 
+	// setup dialer
 	dialer := &gomail.Dialer{
 		Host:     os.Getenv("SMTP_HOST"),
 		Port:     port,
 		Username: os.Getenv("SMTP_EMAIL"),
 		Password: os.Getenv("SMTP_PASSWORD"),
 	}
+
+	// setup firebase
+	firebaseConfigClient := firebase_service.GetFirebaseStorageClient(context.Background())
+	firebaseService := firebase_service.NewFirebaseService(firebaseConfigClient)
 
 	group := app.Group("/api/v1")
 
@@ -40,7 +47,7 @@ func main() {
 		AllowOrigins:     []string{"https://web.ocra.neojarma.com"},
 	}))
 
-	router.Router(group, db, dialer)
+	router.Router(group, db, dialer, firebaseService)
 
 	app.Start(":8080")
 }

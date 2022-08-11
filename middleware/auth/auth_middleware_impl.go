@@ -29,26 +29,27 @@ func NewAuthMiddleware(service session_service.SessionService) AuthMiddleware {
 
 func (middleware *AuthMiddlewareImpl) Auth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		header := c.Request().Header
-		sessionId := header.Get("session-id")
 
-		if sessionId == "" {
+		cookie, err := c.Cookie("session-id")
+		if err != nil {
 			return c.JSON(http.StatusUnauthorized, &response.EmptyObjectDataResponse{
 				Status:  response.StatusFailed,
 				Message: response.MessageMissingSessionId,
 			})
 		}
 
-		_, err := middleware.SessionService.CheckActiveSession(sessionId)
+		sessionId := cookie.Value
+
+		_, err = middleware.SessionService.CheckActiveSession(sessionId)
 		if err != nil {
+			cookieService := cookie_service.NewCookieService().DestroyCookie("session-id")
+			c.SetCookie(cookieService)
+
 			return c.JSON(http.StatusUnauthorized, &response.EmptyObjectDataResponse{
 				Status:  response.StatusFailed,
 				Message: response.MessageInvalidSession,
 			})
 		}
-
-		cookieService := cookie_service.NewCookieService().DestroyCookie("session-id")
-		c.SetCookie(cookieService)
 
 		return next(c)
 	}

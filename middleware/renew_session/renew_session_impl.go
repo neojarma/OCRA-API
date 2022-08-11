@@ -29,8 +29,12 @@ func NewRenewSession(service session_service.SessionService) RenewSession {
 
 func (middleware *RenewSessionImpl) RenewSession(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		header := c.Request().Header
-		sessionId := header.Get("session-id")
+		cookie, err := c.Cookie("session-id")
+		if err != nil {
+			return next(c)
+		}
+
+		sessionId := cookie.Value
 		if sessionId == "" {
 			return next(c)
 		}

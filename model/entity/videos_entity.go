@@ -12,12 +12,12 @@ type Videos struct {
 
 type Video struct {
 	VideoId       string `json:"videoId"`
-	ChannelId     string `json:"channelId,omitempty"`
-	Thumbnail     string `json:"videothumbnail"`
+	ChannelId     string `json:"channelId,omitempty" form:"channel_id"`
+	Thumbnail     string `json:"videoThumbnail"`
 	Video         string `json:"videoUrl"`
-	Title         string `json:"videoTitle"`
-	Description   string `json:"videoDesc"`
-	Tags          string `json:"videoTags"`
+	Title         string `json:"videoTitle" form:"title"`
+	Description   string `json:"videoDesc" form:"description"`
+	Tags          string `json:"videoTags" form:"tags"`
 	CreatedAt     int64  `json:"createdAt" gorm:"autoCreateTime:milli"`
 	ViewsCount    int64  `json:"viewsCount"`
 	LikesCount    int64  `json:"likesCount"`

@@ -62,10 +62,14 @@ func (repository *VideosRepositoryImpl) GetDetailVideos(videoId string) (*joins_
 	return joinModel, nil
 }
 
-func (repository *VideosRepositoryImpl) CreateVideo(req *entity.Videos) (*entity.Videos, error) {
-	panic("not implemented") // TODO: Implement
+func (repository *VideosRepositoryImpl) CreateVideo(req *entity.Video) error {
+	if err := repository.Db.Create(req).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (repository *VideosRepositoryImpl) UpdateVideo(req *entity.Videos) (*entity.Videos, error) {
-	panic("not implemented") // TODO: Implement
+func (repository *VideosRepositoryImpl) UpdateVideo(req *entity.Video) error {
+	return nil
 }

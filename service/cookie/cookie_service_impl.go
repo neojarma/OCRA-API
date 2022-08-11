@@ -2,7 +2,6 @@ package cookie_service
 
 import (
 	"net/http"
-	"os"
 	"sync"
 	"time"
 )
@@ -27,9 +26,9 @@ func (service *cookieServiceImpl) CreateCookie(key, value string, duration time.
 	cookie.Expires = duration
 	cookie.HttpOnly = true
 	cookie.Path = "/"
-	cookie.Domain = os.Getenv("CORS_DOMAIN")
-	cookie.SameSite = http.SameSiteLaxMode
-	cookie.Secure = true
+	// cookie.Domain = os.Getenv("CORS_DOMAIN")
+	// cookie.SameSite = http.SameSiteLaxMode
+	// cookie.Secure = true
 
 	return cookie
 }
@@ -42,9 +41,9 @@ func (service *cookieServiceImpl) DestroyCookie(key string) *http.Cookie {
 	cookie.Expires = time.Unix(0, 0)
 	cookie.MaxAge = -1
 	cookie.Path = "/"
-	cookie.Domain = os.Getenv("CORS_DOMAIN")
-	cookie.SameSite = http.SameSiteLaxMode
-	cookie.Secure = true
+	// cookie.Domain = os.Getenv("CORS_DOMAIN")
+	// cookie.SameSite = http.SameSiteLaxMode
+	// cookie.Secure = true
 
 	return cookie
 }

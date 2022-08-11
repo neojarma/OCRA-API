@@ -4,12 +4,14 @@ import (
 	user_controller "ocra_server/controller/user"
 	verification_controller "ocra_server/controller/verification"
 	video_controller "ocra_server/controller/video"
+	auth_middleware "ocra_server/middleware/auth"
 	"ocra_server/middleware/renew_session"
 	session_repository "ocra_server/repository/session"
 	user_repository "ocra_server/repository/user"
 	verification_repository "ocra_server/repository/verification"
 	videos_repository "ocra_server/repository/video"
 	cookie_service "ocra_server/service/cookie"
+	firebase_service "ocra_server/service/firebase"
 	mail_service "ocra_server/service/mail"
 	session_service "ocra_server/service/session"
 	user_service "ocra_server/service/user"
@@ -23,7 +25,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Router(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer) {
+func Router(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, firebaseService firebase_service.FirebaseService) {
 
 	sessionCache := cache.New(time.Hour*72, time.Hour*120)
 
@@ -31,11 +33,13 @@ func Router(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer) {
 	service := session_service.NewSessionService(repo, sessionCache)
 	middl := renew_session.NewRenewSession(service)
 
+	authMiddleware := auth_middleware.NewAuthMiddleware(service)
+
 	group.Use(middl.RenewSession)
 
 	userRoute(group, db, dialer, sessionCache)
 	verifRoute(group, db, dialer)
-	videoRoute(group, db)
+	videoRoute(group, db, authMiddleware, firebaseService)
 }
 
 func userRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, cache *cache.Cache) {
@@ -66,11 +70,13 @@ func verifRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer) {
 	group.POST("/resend-email-verification", controller.CreateVerificationToken)
 }
 
-func videoRoute(group *echo.Group, db *gorm.DB) {
+func videoRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthMiddleware, firebaseService firebase_service.FirebaseService) {
+
 	repo := videos_repository.NewVideosRepository(db)
-	service := video_service.NewVideoService(repo)
+	service := video_service.NewVideoService(repo, firebaseService)
 	controller := video_controller.NewVideoController(service)
 
 	group.GET("/videos", controller.GetAllVideos)
 	group.GET("/video", controller.GetDetailVideos)
+	group.POST("/video", controller.CreateVideo, middleware.Auth)
 }

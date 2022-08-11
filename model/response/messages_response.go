@@ -40,3 +40,6 @@ const MessageInvalidJsonInput = "invalid value or missing property in body reque
 const MessageInvalidParameter = "invalid query parameter"
 const MessageSuccesGetAllVideos = "success get all videos"
 const MessageSuccesGetVideo = "success get video data"
+const MessageMissingThumbnail = "missing thumbnail in form request"
+const MessageMissingVideo = "missing video in form request"
+const MessageSuccesUploadVideo = "succes upload video"

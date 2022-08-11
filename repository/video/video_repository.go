@@ -9,6 +9,6 @@ type VideosRepository interface {
 	GetAllVideos(offset, limit int) ([]*joins_model.HomeVideoJoin, error)
 	GetDetailVideos(videoId string) (*joins_model.DetailVideoJoin, error)
 	CountTotalRows() int64
-	CreateVideo(req *entity.Videos) (*entity.Videos, error)
-	UpdateVideo(req *entity.Videos) (*entity.Videos, error)
+	CreateVideo(req *entity.Video) error
+	UpdateVideo(req *entity.Video) error
 }
