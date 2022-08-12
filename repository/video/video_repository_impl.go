@@ -1,8 +1,10 @@
 package videos_repository
 
 import (
+	"errors"
 	"ocra_server/model/entity"
 	joins_model "ocra_server/model/joins"
+	"ocra_server/model/response"
 	"sync"
 
 	"gorm.io/gorm"
@@ -54,9 +56,14 @@ func (repository *VideosRepositoryImpl) GetDetailVideos(videoId string) (*joins_
 	videoModel := new(entity.Videos)
 	joinModel := new(joins_model.DetailVideoJoin)
 
-	err := repository.Db.Model(videoModel).Select("videos.video_id", "videos.channel_id", "videos.thumbnail", "videos.video", "videos.title", "videos.description", "videos.tags", "videos.likes_count", "videos.dislikes_count", "videos.created_at", "videos.views_count", "channels.name", "channels.channel_id", "channels.profile_image", "channels.subscriber").Joins("JOIN channels on videos.channel_id = channels.channel_id").Where("videos.video_id = ?", videoId).Find(joinModel).Error
-	if err != nil {
-		return nil, err
+	result := repository.Db.Model(videoModel).Select("videos.video_id", "videos.channel_id", "videos.thumbnail", "videos.video", "videos.title", "videos.description", "videos.tags", "videos.likes_count", "videos.dislikes_count", "videos.created_at", "videos.views_count", "channels.name", "channels.channel_id", "channels.profile_image", "channels.subscriber").Joins("JOIN channels on videos.channel_id = channels.channel_id").Where("videos.video_id = ?", videoId).Find(joinModel)
+
+	if result.RowsAffected == 0 {
+		return nil, errors.New(response.MessageNoVideo)
+	}
+
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	return joinModel, nil

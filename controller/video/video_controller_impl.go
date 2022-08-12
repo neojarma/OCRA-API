@@ -68,6 +68,13 @@ func (controller *VideoControllerImpl) GetDetailVideos(ctx echo.Context) error {
 
 	result, err := controller.Service.GetDetailVideos(videoId)
 	if err != nil {
+		if err.Error() == response.MessageNoVideo {
+			return ctx.JSON(http.StatusNotFound, response.EmptyObjectDataResponse{
+				Status:  response.StatusFailed,
+				Message: err.Error(),
+			})
+		}
+
 		return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
 			Status:  response.StatusFailed,
 			Message: err.Error(),
