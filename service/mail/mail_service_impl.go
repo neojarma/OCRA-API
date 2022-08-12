@@ -2,11 +2,12 @@ package mail_service
 
 import (
 	"bytes"
+	"embed"
+	_ "embed"
 	"fmt"
 	"html/template"
 	"ocra_server/model/request"
 	"os"
-	"path"
 	"sync"
 
 	"gopkg.in/gomail.v2"
@@ -64,15 +65,17 @@ func (service *MailServiceImpl) generateVerificationLink(email, token string) st
 	return fmt.Sprintf("%v://%v/api/v1/email-verification?email=%v&token=%v", schema, host, email, token)
 }
 
+//go:embed template_email.html
+var mailTemplate embed.FS
+
 func (service *MailServiceImpl) parseTemplateFile(data map[string]string) (string, error) {
-	filepath := path.Join("service", "mail", "template_email.html")
-	template, err := template.ParseFiles(filepath)
+	templ, err := template.ParseFS(mailTemplate, "template_email.html")
 	if err != nil {
 		return "", err
 	}
 
 	writer := new(bytes.Buffer)
-	err = template.Execute(writer, data)
+	err = templ.Execute(writer, data)
 	if err != nil {
 		return "", err
 	}
