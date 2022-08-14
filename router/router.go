@@ -1,15 +1,18 @@
 package router
 
 import (
+	channel_controller "ocra_server/controller/channel"
 	user_controller "ocra_server/controller/user"
 	verification_controller "ocra_server/controller/verification"
 	video_controller "ocra_server/controller/video"
 	auth_middleware "ocra_server/middleware/auth"
 	"ocra_server/middleware/renew_session"
+	channel_repository "ocra_server/repository/channels"
 	session_repository "ocra_server/repository/session"
 	user_repository "ocra_server/repository/user"
 	verification_repository "ocra_server/repository/verification"
 	videos_repository "ocra_server/repository/video"
+	channel_service "ocra_server/service/channel"
 	cookie_service "ocra_server/service/cookie"
 	firebase_service "ocra_server/service/firebase"
 	mail_service "ocra_server/service/mail"
@@ -40,6 +43,7 @@ func Router(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, firebaseServi
 	userRoute(group, db, dialer, sessionCache)
 	verifRoute(group, db, dialer)
 	videoRoute(group, db, authMiddleware, firebaseService)
+	channelRoute(group, db, authMiddleware, firebaseService)
 }
 
 func userRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, cache *cache.Cache) {
@@ -78,5 +82,14 @@ func videoRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthM
 
 	group.GET("/videos", controller.GetAllVideos)
 	group.GET("/video", controller.GetDetailVideos)
-	group.POST("/video", controller.CreateVideo, middleware.Auth)
+	group.POST("/video", controller.CreateVideo)
+}
+
+func channelRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthMiddleware, firebaseService firebase_service.FirebaseService) {
+	repo := channel_repository.NewChannelRepository(db)
+	service := channel_service.NewChannelService(repo, firebaseService)
+	controller := channel_controller.NewChannelController(service)
+
+	group.GET("/channel", controller.DetailChannel)
+	group.POST("/channel", controller.CreateChannel)
 }

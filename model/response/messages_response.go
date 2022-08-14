@@ -43,3 +43,11 @@ const MessageSuccesGetVideo = "success get video data"
 const MessageMissingThumbnail = "missing thumbnail in form request"
 const MessageMissingVideo = "missing video in form request"
 const MessageSuccesUploadVideo = "succes upload video"
+const MessageNoVideo = "there is no video with this id"
+
+// channels
+const MessageNoChannelWithID = "theres is no channel with this id"
+const MessageUserAlreadyHasAChannel = "user already has a channel"
+const MessageSuccessGetDetailChannel = "success get detail channel"
+const MessageSuccessCreateChannel = "success create channel"
+const MessageInvalidUserId = "there is no user with this id"
