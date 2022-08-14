@@ -2,11 +2,11 @@ package firebase_service
 
 import (
 	"context"
-	"io"
+	"mime/multipart"
 )
 
 type FirebaseService interface {
-	CreateResource(ctx context.Context, path string, file io.Reader) error
-	GenerateFirebaseStorageLink(path string) string
+	CreateResource(ctx context.Context, path string, file *multipart.FileHeader) (string, error)
+	generateFirebaseStorageLink(path string) string
 	DeleteResource(ctx context.Context, path string) error
 }

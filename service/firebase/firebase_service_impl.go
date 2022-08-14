@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"os"
+	"strings"
 	"sync"
 
 	"cloud.google.com/go/storage"
@@ -29,20 +31,34 @@ func NewFirebaseService(firestorage *storage.BucketHandle) FirebaseService {
 	return service
 }
 
-func (service *FirebaseServiceImpl) CreateResource(ctx context.Context, path string, file io.Reader) error {
+func (service *FirebaseServiceImpl) CreateResource(ctx context.Context, path string, file *multipart.FileHeader) (string, error) {
+	openFile, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+
+	defer openFile.Close()
+
+	path = service.getResourcePath(path, file.Filename)
 	w := service.Firestorage.Object(path).NewWriter(ctx)
-	if _, err := io.Copy(w, file); err != nil {
-		return err
+	if _, err := io.Copy(w, openFile); err != nil {
+		return "", err
 	}
 
 	if err := w.Close(); err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	resouceLink := service.generateFirebaseStorageLink(path)
+	return resouceLink, nil
 }
 
-func (service *FirebaseServiceImpl) GenerateFirebaseStorageLink(path string) string {
+func (service *FirebaseServiceImpl) getResourcePath(path, fileName string) string {
+	newFileName := strings.ReplaceAll(fileName, " ", "")
+	return path + newFileName
+}
+
+func (service *FirebaseServiceImpl) generateFirebaseStorageLink(path string) string {
 	bucket := os.Getenv("FIREBASE_BUCKET_NAME")
 	return fmt.Sprint(host, bucket, "/", path)
 }
