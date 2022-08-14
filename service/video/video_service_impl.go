@@ -9,7 +9,6 @@ import (
 	"ocra_server/model/response"
 	videos_repository "ocra_server/repository/video"
 	firebase_service "ocra_server/service/firebase"
-	"strings"
 	"sync"
 )
 
@@ -64,7 +63,7 @@ func (service *VideoServiceImpl) CreateVideo(req *entity.Video, thumbnail, video
 
 	// parsing thumbnail
 	thumbnailPath := helper.GetThumbnailFilePath(req.ChannelId, req.VideoId)
-	thumbnailUrl, err := service.parsingFormFile(thumbnail, thumbnailPath)
+	thumbnailUrl, err := service.FirebaseService.CreateResource(context.Background(), thumbnailPath, thumbnail)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +71,7 @@ func (service *VideoServiceImpl) CreateVideo(req *entity.Video, thumbnail, video
 
 	// parsing video
 	videoPath := helper.GetVideoFilePath(req.ChannelId, req.VideoId)
-	videoUrl, err := service.parsingFormFile(video, videoPath)
+	videoUrl, err := service.FirebaseService.CreateResource(context.Background(), videoPath, video)
 	if err != nil {
 		return nil, err
 	}
@@ -84,21 +83,6 @@ func (service *VideoServiceImpl) CreateVideo(req *entity.Video, thumbnail, video
 	}
 
 	return req, nil
-}
-
-func (service *VideoServiceImpl) parsingFormFile(file *multipart.FileHeader, path string) (string, error) {
-	openFile, err := file.Open()
-	if err != nil {
-		return "", err
-	}
-
-	defer openFile.Close()
-
-	newFileName := strings.ReplaceAll(file.Filename, " ", "")
-	path = path + newFileName
-	service.FirebaseService.CreateResource(context.Background(), path, openFile)
-
-	return service.FirebaseService.GenerateFirebaseStorageLink(path), nil
 }
 
 func (service *VideoServiceImpl) UpdateVideo(req *entity.Videos) (*entity.Videos, error) {
