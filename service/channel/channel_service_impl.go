@@ -84,7 +84,7 @@ func (service *ChannelServiceImpl) DetailChannel(req *request.GetDetailChannelRe
 	}
 
 	offset := (page - 1) * limit
-	domainRes, err := service.ChannelRepository.DetailChannel(req.ChannelId, offset, limit)
+	domainRes, err := service.ChannelRepository.DetailChannel(req.ChannelId, req.Exclude, offset, limit)
 	if err != nil {
 		return nil, err
 	}

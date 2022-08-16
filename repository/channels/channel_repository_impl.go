@@ -28,7 +28,7 @@ func NewChannelRepository(db *gorm.DB) ChannelRepository {
 	return repo
 }
 
-func (repository *ChannelRepositoryImpl) DetailChannel(channelId string, offset, limit int) ([]*joins_model.VideoChannelJoin, error) {
+func (repository *ChannelRepositoryImpl) DetailChannel(channelId, excludeVideo string, offset, limit int) ([]*joins_model.VideoChannelJoin, error) {
 	videoModel := new(entity.Videos)
 	joinModel := make([]*joins_model.VideoChannelJoin, 0)
 
@@ -36,7 +36,7 @@ func (repository *ChannelRepositoryImpl) DetailChannel(channelId string, offset,
 		return d.Offset(offset).Limit(limit)
 	}
 
-	err := repository.Db.Model(videoModel).Select("videos.video_id", "videos.channel_id", "videos.thumbnail", "videos.video", "videos.title", "videos.created_at", "videos.views_count", "channels.channel_id", "channels.name", "channels.profile_image", "channels.banner_image", "channels.created_at", "channels.subscriber").Joins("JOIN channels on videos.channel_id = channels.channel_id").Scopes(paginationFunc).Where("channels.channel_id = ? ", channelId).Find(&joinModel).Error
+	err := repository.Db.Model(videoModel).Select("videos.video_id", "videos.channel_id", "videos.thumbnail", "videos.video", "videos.title", "videos.created_at", "videos.views_count", "channels.channel_id", "channels.name", "channels.profile_image", "channels.banner_image", "channels.created_at", "channels.subscriber").Joins("JOIN channels on videos.channel_id = channels.channel_id").Scopes(paginationFunc).Where("channels.channel_id = ? ", channelId).Where("videos.video_id != ?", excludeVideo).Find(&joinModel).Error
 	if err != nil {
 		return nil, err
 	}

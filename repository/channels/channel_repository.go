@@ -6,7 +6,7 @@ import (
 )
 
 type ChannelRepository interface {
-	DetailChannel(channelId string, offset, limit int) ([]*joins_model.VideoChannelJoin, error)
+	DetailChannel(channelId, excludeVideo string, offset, limit int) ([]*joins_model.VideoChannelJoin, error)
 	IsUserSubscribeThisChannel(userId, channelId string) bool
 	GetOnlyChannelData(channelId string) (*entity.Channel, error)
 	CreateChannel(req *entity.Channel) error

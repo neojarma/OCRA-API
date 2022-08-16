@@ -5,4 +5,5 @@ type GetDetailChannelRequest struct {
 	ChannelId string `query:"channel"`
 	Page      string `query:"page"`
 	Limit     string `query:"limit"`
+	Exclude   string `query:"exclude"`
 }
