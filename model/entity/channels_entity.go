@@ -2,7 +2,7 @@ package entity
 
 type Channels struct {
 	ChannelId    string  `form:"channel_id" json:"channelId"`
-	UserId       string  `form:"user_id" json:"userId"`
+	UserId       string  `form:"user_id" json:"userId,omitempty"`
 	Name         string  `form:"channel_name" json:"channelName"`
 	ProfileImage *string `form:"profileImage" json:"channelProfile"`
 }

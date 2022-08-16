@@ -5,7 +5,6 @@ import (
 	"ocra_server/model/entity"
 	"ocra_server/model/response"
 	videos_service "ocra_server/service/video"
-	"strconv"
 	"sync"
 
 	"github.com/labstack/echo/v4"
@@ -32,23 +31,7 @@ func (controller *VideoControllerImpl) GetAllVideos(ctx echo.Context) error {
 	page := ctx.QueryParam("page")
 	size := ctx.QueryParam("size")
 
-	pageNumber, err := strconv.Atoi(page)
-	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, response.EmptyArrayDataResponse{
-			Status:  response.StatusFailed,
-			Message: response.MessageInvalidParameter,
-		})
-	}
-
-	sizeNumber, err := strconv.Atoi(size)
-	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, response.EmptyArrayDataResponse{
-			Status:  response.StatusFailed,
-			Message: response.MessageInvalidParameter,
-		})
-	}
-
-	result, err := controller.Service.GetAllVideos(pageNumber, sizeNumber)
+	result, err := controller.Service.GetAllVideos(page, size)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, response.EmptyArrayDataResponse{
 			Status:  response.StatusFailed,

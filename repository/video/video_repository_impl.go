@@ -2,6 +2,7 @@ package videos_repository
 
 import (
 	"errors"
+	"ocra_server/helper"
 	"ocra_server/model/entity"
 	joins_model "ocra_server/model/joins"
 	"ocra_server/model/response"
@@ -32,9 +33,7 @@ func (repository *VideosRepositoryImpl) GetAllVideos(offset, limit int) ([]*join
 	videoModel := new(entity.Videos)
 	joinModel := make([]*joins_model.HomeVideoJoin, 0)
 
-	paginationFunc := func(d *gorm.DB) *gorm.DB {
-		return d.Offset(offset).Limit(limit)
-	}
+	paginationFunc := helper.GetPaginationFunc(repository.Db, offset, limit)
 
 	err := repository.Db.Model(videoModel).Select("videos.video_id", "videos.channel_id", "videos.thumbnail", "videos.video", "videos.title", "videos.created_at", "videos.views_count", "channels.channel_id", "channels.name", "channels.profile_image").Joins("JOIN channels on videos.channel_id = channels.channel_id").Scopes(paginationFunc).Find(&joinModel).Error
 	if err != nil {

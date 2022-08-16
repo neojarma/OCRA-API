@@ -8,14 +8,9 @@ import (
 	joins_model "ocra_server/model/joins"
 	"ocra_server/model/request"
 	channel_repository "ocra_server/repository/channels"
-	firebase_service "ocra_server/service/firebase"
-	"strconv"
-	"sync"
-)
 
-const (
-	defaultPageNumber      = 0
-	defaultLimitPageNumber = 8
+	firebase_service "ocra_server/service/firebase"
+	"sync"
 )
 
 type ChannelServiceImpl struct {
@@ -73,17 +68,7 @@ func (service *ChannelServiceImpl) CreateChannel(req *entity.Channels, image *mu
 }
 
 func (service *ChannelServiceImpl) DetailChannel(req *request.GetDetailChannelRequest) (*joins_model.ChannelVideoJoin, error) {
-	page, err := strconv.Atoi(req.Page)
-	if err != nil {
-		page = defaultPageNumber
-	}
-
-	limit, err := strconv.Atoi(req.Limit)
-	if err != nil {
-		limit = defaultLimitPageNumber
-	}
-
-	offset := (page - 1) * limit
+	offset, limit, _ := helper.ParseOffsetValue(req.Page, req.Limit)
 	domainRes, err := service.ChannelRepository.DetailChannel(req.ChannelId, req.Exclude, offset, limit)
 	if err != nil {
 		return nil, err

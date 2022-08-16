@@ -2,10 +2,10 @@ package channel_repository
 
 import (
 	"errors"
+	"ocra_server/helper"
 	"ocra_server/model/entity"
 	joins_model "ocra_server/model/joins"
 	"ocra_server/model/response"
-	"strings"
 	"sync"
 
 	"gorm.io/gorm"
@@ -32,9 +32,7 @@ func (repository *ChannelRepositoryImpl) DetailChannel(channelId, excludeVideo s
 	videoModel := new(entity.Videos)
 	joinModel := make([]*joins_model.VideoChannelJoin, 0)
 
-	paginationFunc := func(d *gorm.DB) *gorm.DB {
-		return d.Offset(offset).Limit(limit)
-	}
+	paginationFunc := helper.GetPaginationFunc(repository.Db, offset, limit)
 
 	err := repository.Db.Model(videoModel).Select("videos.video_id", "videos.channel_id", "videos.thumbnail", "videos.video", "videos.title", "videos.created_at", "videos.views_count", "channels.channel_id", "channels.name", "channels.profile_image", "channels.banner_image", "channels.created_at", "channels.subscriber").Joins("JOIN channels on videos.channel_id = channels.channel_id").Scopes(paginationFunc).Where("channels.channel_id = ? ", channelId).Where("videos.video_id != ?", excludeVideo).Find(&joinModel).Error
 	if err != nil {
@@ -68,9 +66,7 @@ func (repository *ChannelRepositoryImpl) CreateChannel(req *entity.Channel) erro
 	err := repository.Db.Create(req).Error
 
 	if err != nil {
-		errStr := strings.Split(err.Error(), " ")
-		isForeignKeyErr := errStr[1] == "1452:"
-		if isForeignKeyErr {
+		if helper.IsInvalidForeignKey(err) {
 			return errors.New(response.MessageInvalidUserId)
 		}
 	}

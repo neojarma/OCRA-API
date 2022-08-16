@@ -31,11 +31,12 @@ func NewVideoService(repo videos_repository.VideosRepository, firebaseService fi
 	return service
 }
 
-func (service *VideoServiceImpl) GetAllVideos(page, limit int) (*response.VideosResponse, error) {
+func (service *VideoServiceImpl) GetAllVideos(page, limitReq string) (*response.VideosResponse, error) {
 	totalRows := make(chan int64)
 	defer close(totalRows)
 
-	offset := (page - 1) * limit
+	offset, limit, newPage := helper.ParseOffsetValue(page, limitReq)
+
 	resultVideos, err := service.Repo.GetAllVideos(offset, limit)
 	if err != nil {
 		return nil, err
@@ -47,7 +48,7 @@ func (service *VideoServiceImpl) GetAllVideos(page, limit int) (*response.Videos
 
 	rows := <-totalRows
 	return &response.VideosResponse{
-		Page:        page,
+		Page:        newPage,
 		Limit:       limit,
 		TotalVideos: rows,
 		Videos:      resultVideos,
