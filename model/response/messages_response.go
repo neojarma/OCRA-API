@@ -51,3 +51,10 @@ const MessageUserAlreadyHasAChannel = "user already has a channel"
 const MessageSuccessGetDetailChannel = "success get detail channel"
 const MessageSuccessCreateChannel = "success create channel"
 const MessageInvalidUserId = "there is no user with this id"
+
+// comments
+const MessageInvalidChannelId = "there is no channel with this id"
+const MessageSuccesGetAllComment = "success get all comment"
+const MessageSuccessCreateComment = "success create comment"
+const MessageSuccessUpdateComment = "success update comment"
+const MessageSuccessDeleteComment = "success delete comment"
