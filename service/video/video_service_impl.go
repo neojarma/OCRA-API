@@ -6,25 +6,36 @@ import (
 	"ocra_server/helper"
 	"ocra_server/model/entity"
 	joins_model "ocra_server/model/joins"
+	"ocra_server/model/request"
 	"ocra_server/model/response"
 	videos_repository "ocra_server/repository/video"
+	choice_service "ocra_server/service/choice"
 	firebase_service "ocra_server/service/firebase"
+	subscribe_service "ocra_server/service/subscribe"
 	"sync"
 )
 
 type VideoServiceImpl struct {
-	Repo            videos_repository.VideosRepository
-	FirebaseService firebase_service.FirebaseService
+	Repo             videos_repository.VideosRepository
+	FirebaseService  firebase_service.FirebaseService
+	SubscribeService subscribe_service.SubscribeService
+	ChoiceService    choice_service.ChoiceService
 }
 
-func NewVideoService(repo videos_repository.VideosRepository, firebaseService firebase_service.FirebaseService) VideoService {
+func NewVideoService(
+	repo videos_repository.VideosRepository,
+	firebaseService firebase_service.FirebaseService,
+	subsService subscribe_service.SubscribeService,
+	choiceService choice_service.ChoiceService) VideoService {
 	var doOnce sync.Once
 	service := new(VideoServiceImpl)
 
 	doOnce.Do(func() {
 		service = &VideoServiceImpl{
-			Repo:            repo,
-			FirebaseService: firebaseService,
+			Repo:             repo,
+			FirebaseService:  firebaseService,
+			SubscribeService: subsService,
+			ChoiceService:    choiceService,
 		}
 	})
 
@@ -55,8 +66,40 @@ func (service *VideoServiceImpl) GetAllVideos(page, limitReq string) (*response.
 	}, nil
 }
 
-func (service *VideoServiceImpl) GetDetailVideos(videoId string) (*joins_model.DetailVideoJoin, error) {
-	return service.Repo.GetDetailVideos(videoId)
+func (service *VideoServiceImpl) GetDetailVideos(req *request.DetailVideoRequest) (*joins_model.DetailVideoJoin, error) {
+
+	result, err := service.Repo.GetDetailVideos(req.VideoId)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.UserId == "" {
+		result.UserId = nil
+		result.IsSubscribe = false
+		result.IsDislikeVideo = false
+		result.IsLikeVideo = false
+	} else {
+		result.UserId = &req.UserId
+
+		result.IsDislikeVideo = service.ChoiceService.IsUserDislikeTheVideo(&entity.Dislikes{
+			UserId:  req.UserId,
+			VideoId: req.VideoId,
+		})
+
+		result.IsLikeVideo = service.ChoiceService.IsUserLikeTheVideo(&entity.Likes{
+			UserId:  req.UserId,
+			VideoId: req.VideoId,
+		})
+
+		result.IsSubscribe = service.SubscribeService.IsUserSubscribeThisChannel(&entity.Subscribes{
+			ChannelId: req.ChannelId,
+			UserId:    req.UserId,
+		})
+	}
+
+	result.Channel.ChannelId = req.ChannelId
+
+	return result, err
 }
 
 func (service *VideoServiceImpl) CreateVideo(req *entity.Video, thumbnail, video *multipart.FileHeader) (*entity.Video, error) {

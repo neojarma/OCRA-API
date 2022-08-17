@@ -3,6 +3,7 @@ package video_controller
 import (
 	"net/http"
 	"ocra_server/model/entity"
+	"ocra_server/model/request"
 	"ocra_server/model/response"
 	videos_service "ocra_server/service/video"
 	"sync"
@@ -47,9 +48,15 @@ func (controller *VideoControllerImpl) GetAllVideos(ctx echo.Context) error {
 }
 
 func (controller *VideoControllerImpl) GetDetailVideos(ctx echo.Context) error {
-	videoId := ctx.QueryParam("id")
+	req := new(request.DetailVideoRequest)
+	if err := ctx.Bind(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
 
-	result, err := controller.Service.GetDetailVideos(videoId)
+	result, err := controller.Service.GetDetailVideos(req)
 	if err != nil {
 		if err.Error() == response.MessageNoVideo {
 			return ctx.JSON(http.StatusNotFound, response.EmptyObjectDataResponse{

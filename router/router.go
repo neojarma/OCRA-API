@@ -89,8 +89,15 @@ func verifRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer) {
 
 func videoRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthMiddleware, firebaseService firebase_service.FirebaseService) {
 
+	likeRepo := like_repository.NewLikeRepository(db)
+	dislikeRepo := dislike_repository.NewDislikeRepository(db)
+	choiceService := choice_service.NewChoiceService(likeRepo, dislikeRepo)
+
+	subsRepo := subscribe_repository.NewSubsRepository(db)
+	subsService := subscribe_service.NewSubsService(subsRepo)
+
 	repo := videos_repository.NewVideosRepository(db)
-	service := video_service.NewVideoService(repo, firebaseService)
+	service := video_service.NewVideoService(repo, firebaseService, subsService, choiceService)
 	controller := video_controller.NewVideoController(service)
 
 	group.GET("/videos", controller.GetAllVideos)

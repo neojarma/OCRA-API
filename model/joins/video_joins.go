@@ -8,8 +8,12 @@ type HomeVideoJoin struct {
 }
 
 type DetailVideoJoin struct {
-	Video   entity.Video    `json:"video" gorm:"embedded"`
-	Channel entity.Channels `json:"channel" gorm:"embedded"`
+	UserId         *string         `json:"userId"`
+	IsSubscribe    bool            `json:"isSubscribe"`
+	IsLikeVideo    bool            `json:"isLikeVideo"`
+	IsDislikeVideo bool            `json:"isDislikeVideo"`
+	Video          entity.Video    `json:"video" gorm:"embedded"`
+	Channel        entity.Channels `json:"channel" gorm:"embedded"`
 }
 
 type VideoChannelJoin struct {
