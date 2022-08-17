@@ -58,3 +58,9 @@ const MessageSuccesGetAllComment = "success get all comment"
 const MessageSuccessCreateComment = "success create comment"
 const MessageSuccessUpdateComment = "success update comment"
 const MessageSuccessDeleteComment = "success delete comment"
+
+// like and dislike
+const MessageSuccesLikeVideo = "success like video"
+const MessageSuccessDislikeVideo = "success dislike video"
+const MessageAlreadyLikeThisVideo = "already like this video"
+const MessageAlreadyDislikeThisVideo = "already dislike this video"

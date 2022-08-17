@@ -2,6 +2,7 @@ package router
 
 import (
 	channel_controller "ocra_server/controller/channel"
+	choice_controller "ocra_server/controller/choice"
 	comment_controller "ocra_server/controller/comment"
 	user_controller "ocra_server/controller/user"
 	verification_controller "ocra_server/controller/verification"
@@ -10,11 +11,14 @@ import (
 	"ocra_server/middleware/renew_session"
 	channel_repository "ocra_server/repository/channels"
 	comment_repository "ocra_server/repository/comment"
+	dislike_repository "ocra_server/repository/dislike"
+	like_repository "ocra_server/repository/like"
 	session_repository "ocra_server/repository/session"
 	user_repository "ocra_server/repository/user"
 	verification_repository "ocra_server/repository/verification"
 	videos_repository "ocra_server/repository/video"
 	channel_service "ocra_server/service/channel"
+	choice_service "ocra_server/service/choice"
 	comment_service "ocra_server/service/comment"
 	cookie_service "ocra_server/service/cookie"
 	firebase_service "ocra_server/service/firebase"
@@ -48,6 +52,7 @@ func Router(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, firebaseServi
 	videoRoute(group, db, authMiddleware, firebaseService)
 	channelRoute(group, db, authMiddleware, firebaseService)
 	commentRoute(group, db, authMiddleware)
+	userChoiceRoute(group, db)
 }
 
 func userRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, cache *cache.Cache) {
@@ -107,4 +112,14 @@ func commentRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.Aut
 	group.POST("/comment", controller.CreateComment)
 	group.PATCH("/comment", controller.UpdateComment)
 	group.DELETE("/comment", controller.DeleteComment)
+}
+
+func userChoiceRoute(group *echo.Group, db *gorm.DB) {
+	likeRepo := like_repository.NewLikeRepository(db)
+	dislikeRepo := dislike_repository.NewDislikeRepository(db)
+	choiceService := choice_service.NewChoiceService(likeRepo, dislikeRepo)
+	controller := choice_controller.NewChoiceController(choiceService)
+
+	group.POST("/like", controller.CreateLike)
+	group.POST("/dislike", controller.CreateDislike)
 }
