@@ -4,6 +4,7 @@ import (
 	channel_controller "ocra_server/controller/channel"
 	choice_controller "ocra_server/controller/choice"
 	comment_controller "ocra_server/controller/comment"
+	subscriber_controller "ocra_server/controller/subscribe"
 	user_controller "ocra_server/controller/user"
 	verification_controller "ocra_server/controller/verification"
 	video_controller "ocra_server/controller/video"
@@ -14,6 +15,7 @@ import (
 	dislike_repository "ocra_server/repository/dislike"
 	like_repository "ocra_server/repository/like"
 	session_repository "ocra_server/repository/session"
+	subscribe_repository "ocra_server/repository/subscribe"
 	user_repository "ocra_server/repository/user"
 	verification_repository "ocra_server/repository/verification"
 	videos_repository "ocra_server/repository/video"
@@ -24,6 +26,7 @@ import (
 	firebase_service "ocra_server/service/firebase"
 	mail_service "ocra_server/service/mail"
 	session_service "ocra_server/service/session"
+	subscribe_service "ocra_server/service/subscribe"
 	user_service "ocra_server/service/user"
 	verification_service "ocra_server/service/verification"
 	video_service "ocra_server/service/video"
@@ -53,6 +56,7 @@ func Router(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, firebaseServi
 	channelRoute(group, db, authMiddleware, firebaseService)
 	commentRoute(group, db, authMiddleware)
 	userChoiceRoute(group, db)
+	subscribeRoute(group, db)
 }
 
 func userRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, cache *cache.Cache) {
@@ -122,4 +126,13 @@ func userChoiceRoute(group *echo.Group, db *gorm.DB) {
 
 	group.POST("/like", controller.CreateLike)
 	group.POST("/dislike", controller.CreateDislike)
+}
+
+func subscribeRoute(group *echo.Group, db *gorm.DB) {
+	repo := subscribe_repository.NewSubsRepository(db)
+	service := subscribe_service.NewSubsService(repo)
+	controller := subscriber_controller.NewSubsController(service)
+
+	group.POST("/subs", controller.SubscribeChannel)
+	group.POST("/unsubs", controller.UnsubscribeChannel)
 }
