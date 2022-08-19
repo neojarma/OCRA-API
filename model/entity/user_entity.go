@@ -7,6 +7,6 @@ type Users struct {
 	Email        string
 	Password     string
 	IsVerified   bool
-	CreatedAt    int64
-	UpdatedAt    int64
+	CreatedAt    int64 `gorm:"autoCreateTime:milli"`
+	UpdatedAt    int64 `gorm:"autoUpdateTime:milli"`
 }
