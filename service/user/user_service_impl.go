@@ -94,7 +94,7 @@ func (service *UserServiceImpl) Register(reqUser *request.UserRequest) (*respons
 	}
 
 	return &response.UserResponse{
-		CreatedAt:        time.Now().String(),
+		CreatedAt:        timeCreated,
 		UserId:           newUserId,
 		FullName:         reqUser.FullName,
 		UserProfileImage: nil,
