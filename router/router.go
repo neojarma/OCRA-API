@@ -50,30 +50,34 @@ func Router(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, firebaseServi
 
 	group.Use(middl.RenewSession)
 
-	UserRoute(group, db, dialer, sessionCache)
+	UserRoute(group, db, dialer, sessionCache, firebaseService, authMiddleware)
 	VerifRoute(group, db, dialer)
 	VideoRoute(group, db, authMiddleware, firebaseService)
 	ChannelRoute(group, db, authMiddleware, firebaseService)
 	CommentRoute(group, db, authMiddleware)
-	userChoiceRoute(group, db)
-	subscribeRoute(group, db)
+	UserChoiceRoute(group, db)
+	SubscribeRoute(group, db)
 }
 
-func UserRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, cache *cache.Cache) user_controller.UserController {
+func UserRoute(
+	group *echo.Group, db *gorm.DB,
+	dialer *gomail.Dialer, cache *cache.Cache,
+	firebaseService firebase_service.FirebaseService,
+	authMiddleware auth_middleware.AuthMiddleware) user_controller.UserController {
 	userRepo := user_repository.NewUserRepository(db)
 	mailService := mail_service.NewMailService(dialer)
 	verifRepo := verification_repository.NewVerificationRepository(db)
 	verifService := verification_service.NewVerificationService(verifRepo, mailService, userRepo)
 	sessionRepo := session_repository.NewSessionRepository(db)
 	sessionService := session_service.NewSessionService(sessionRepo, cache)
-	service := user_service.NewUserService(userRepo, verifService, sessionService)
+	service := user_service.NewUserService(userRepo, verifService, sessionService, firebaseService)
 	cookieService := cookie_service.NewCookieService()
 	controller := user_controller.NewUserController(service, cookieService)
 
 	group.POST("/auth/login", controller.Login)
 	group.DELETE("/logout", controller.Logout)
 	group.POST("/register", controller.Register)
-	group.PATCH("/user/:id", controller.UpdateUser)
+	group.PATCH("/user/:id", controller.UpdateUser, authMiddleware.Auth)
 
 	return controller
 }
@@ -135,7 +139,7 @@ func CommentRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.Aut
 	return controller
 }
 
-func userChoiceRoute(group *echo.Group, db *gorm.DB) choice_controller.ChoiceController {
+func UserChoiceRoute(group *echo.Group, db *gorm.DB) choice_controller.ChoiceController {
 	likeRepo := like_repository.NewLikeRepository(db)
 	dislikeRepo := dislike_repository.NewDislikeRepository(db)
 	choiceService := choice_service.NewChoiceService(likeRepo, dislikeRepo)
@@ -147,7 +151,7 @@ func userChoiceRoute(group *echo.Group, db *gorm.DB) choice_controller.ChoiceCon
 	return controller
 }
 
-func subscribeRoute(group *echo.Group, db *gorm.DB) subscriber_controller.SubscribeController {
+func SubscribeRoute(group *echo.Group, db *gorm.DB) subscriber_controller.SubscribeController {
 	repo := subscribe_repository.NewSubsRepository(db)
 	service := subscribe_service.NewSubsService(repo)
 	controller := subscriber_controller.NewSubsController(service)

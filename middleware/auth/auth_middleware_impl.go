@@ -40,7 +40,7 @@ func (middleware *AuthMiddlewareImpl) Auth(next echo.HandlerFunc) echo.HandlerFu
 
 		sessionId := cookie.Value
 
-		_, err = middleware.SessionService.CheckActiveSession(sessionId)
+		session, err := middleware.SessionService.CheckActiveSession(sessionId)
 		if err != nil {
 			cookieService := cookie_service.NewCookieService().DestroyCookie("session-id")
 			c.SetCookie(cookieService)
@@ -50,6 +50,8 @@ func (middleware *AuthMiddlewareImpl) Auth(next echo.HandlerFunc) echo.HandlerFu
 				Message: response.MessageInvalidSession,
 			})
 		}
+
+		c.Request().Header.Add("user-id", session.UserId)
 
 		return next(c)
 	}

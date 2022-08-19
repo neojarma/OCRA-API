@@ -137,10 +137,36 @@ func (controller *UserControllerImpl) Register(ctx echo.Context) error {
 
 func (controller *UserControllerImpl) UpdateUser(ctx echo.Context) error {
 	req := new(request.UserRequest)
-	ctx.Bind(req)
-	if _, err := controller.Service.UpdateUser(req); err != nil {
-		return ctx.String(http.StatusInternalServerError, "false")
+	if err := ctx.Bind(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, &response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: response.MessageErrorBindingData,
+		})
 	}
 
-	return ctx.String(http.StatusOK, "ok")
+	// compare user id from cookie and path user id
+	userIdFromCookie := ctx.Request().Header.Get("user-id")
+	if req.UserId != userIdFromCookie {
+		return ctx.JSON(http.StatusUnauthorized, &response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: response.MessageDifferentUserId,
+		})
+	}
+
+	profileImage, err := ctx.FormFile("profile")
+	if err != nil {
+		profileImage = nil
+	}
+
+	if _, err := controller.Service.UpdateUser(req, profileImage); err != nil {
+		return ctx.JSON(http.StatusInternalServerError, response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: response.MessageFailedUpdateUserData,
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, response.EmptyObjectDataResponse{
+		Status:  response.StatusSuccess,
+		Message: response.MessageSuccessUpdateUserData,
+	})
 }
