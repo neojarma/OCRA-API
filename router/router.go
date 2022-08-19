@@ -50,16 +50,16 @@ func Router(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, firebaseServi
 
 	group.Use(middl.RenewSession)
 
-	userRoute(group, db, dialer, sessionCache)
-	verifRoute(group, db, dialer)
-	videoRoute(group, db, authMiddleware, firebaseService)
-	channelRoute(group, db, authMiddleware, firebaseService)
-	commentRoute(group, db, authMiddleware)
+	UserRoute(group, db, dialer, sessionCache)
+	VerifRoute(group, db, dialer)
+	VideoRoute(group, db, authMiddleware, firebaseService)
+	ChannelRoute(group, db, authMiddleware, firebaseService)
+	CommentRoute(group, db, authMiddleware)
 	userChoiceRoute(group, db)
 	subscribeRoute(group, db)
 }
 
-func userRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, cache *cache.Cache) {
+func UserRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, cache *cache.Cache) user_controller.UserController {
 	userRepo := user_repository.NewUserRepository(db)
 	mailService := mail_service.NewMailService(dialer)
 	verifRepo := verification_repository.NewVerificationRepository(db)
@@ -74,9 +74,11 @@ func userRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer, cache *cac
 	group.DELETE("/logout", controller.Logout)
 	group.POST("/register", controller.Register)
 	group.PATCH("/user/:id", controller.UpdateUser)
+
+	return controller
 }
 
-func verifRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer) {
+func VerifRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer) verification_controller.VerificationController {
 	verifRepo := verification_repository.NewVerificationRepository(db)
 	mailService := mail_service.NewMailService(dialer)
 	userRepo := user_repository.NewUserRepository(db)
@@ -85,9 +87,11 @@ func verifRoute(group *echo.Group, db *gorm.DB, dialer *gomail.Dialer) {
 
 	group.GET("/email-verification", controller.ValidateVerificationToken)
 	group.POST("/resend-email-verification", controller.CreateVerificationToken)
+
+	return controller
 }
 
-func videoRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthMiddleware, firebaseService firebase_service.FirebaseService) {
+func VideoRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthMiddleware, firebaseService firebase_service.FirebaseService) video_controller.VideoController {
 
 	likeRepo := like_repository.NewLikeRepository(db)
 	dislikeRepo := dislike_repository.NewDislikeRepository(db)
@@ -103,18 +107,22 @@ func videoRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthM
 	group.GET("/videos", controller.GetAllVideos)
 	group.GET("/video", controller.GetDetailVideos)
 	group.POST("/video", controller.CreateVideo)
+
+	return controller
 }
 
-func channelRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthMiddleware, firebaseService firebase_service.FirebaseService) {
+func ChannelRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthMiddleware, firebaseService firebase_service.FirebaseService) channel_controller.ChannelController {
 	repo := channel_repository.NewChannelRepository(db)
 	service := channel_service.NewChannelService(repo, firebaseService)
 	controller := channel_controller.NewChannelController(service)
 
 	group.GET("/channel", controller.DetailChannel)
 	group.POST("/channel", controller.CreateChannel)
+
+	return controller
 }
 
-func commentRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthMiddleware) {
+func CommentRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.AuthMiddleware) comment_controller.CommentController {
 	repo := comment_repository.NewCommentRepository(db)
 	service := comment_service.NewCommentService(repo)
 	controller := comment_controller.NewCommentController(service)
@@ -123,9 +131,11 @@ func commentRoute(group *echo.Group, db *gorm.DB, middleware auth_middleware.Aut
 	group.POST("/comment", controller.CreateComment)
 	group.PATCH("/comment", controller.UpdateComment)
 	group.DELETE("/comment", controller.DeleteComment)
+
+	return controller
 }
 
-func userChoiceRoute(group *echo.Group, db *gorm.DB) {
+func userChoiceRoute(group *echo.Group, db *gorm.DB) choice_controller.ChoiceController {
 	likeRepo := like_repository.NewLikeRepository(db)
 	dislikeRepo := dislike_repository.NewDislikeRepository(db)
 	choiceService := choice_service.NewChoiceService(likeRepo, dislikeRepo)
@@ -133,13 +143,17 @@ func userChoiceRoute(group *echo.Group, db *gorm.DB) {
 
 	group.POST("/like", controller.CreateLike)
 	group.POST("/dislike", controller.CreateDislike)
+
+	return controller
 }
 
-func subscribeRoute(group *echo.Group, db *gorm.DB) {
+func subscribeRoute(group *echo.Group, db *gorm.DB) subscriber_controller.SubscribeController {
 	repo := subscribe_repository.NewSubsRepository(db)
 	service := subscribe_service.NewSubsService(repo)
 	controller := subscriber_controller.NewSubsController(service)
 
 	group.POST("/subs", controller.SubscribeChannel)
 	group.POST("/unsubs", controller.UnsubscribeChannel)
+
+	return controller
 }
