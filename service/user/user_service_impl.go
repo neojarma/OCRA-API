@@ -1,12 +1,15 @@
 package user_service
 
 import (
+	"context"
+	"mime/multipart"
 	"ocra_server/helper"
 	"ocra_server/model/entity"
 	joins_model "ocra_server/model/joins"
 	"ocra_server/model/request"
 	"ocra_server/model/response"
 	user_repository "ocra_server/repository/user"
+	firebase_service "ocra_server/service/firebase"
 	session_service "ocra_server/service/session"
 	verification_service "ocra_server/service/verification"
 	"sync"
@@ -14,20 +17,26 @@ import (
 )
 
 type UserServiceImpl struct {
-	UserRepo       user_repository.UserRepository
-	VerifService   verification_service.VerificationService
-	SessionService session_service.SessionService
+	UserRepo        user_repository.UserRepository
+	VerifService    verification_service.VerificationService
+	SessionService  session_service.SessionService
+	FirebaseService firebase_service.FirebaseService
 }
 
-func NewUserService(userRepo user_repository.UserRepository, verifService verification_service.VerificationService, sessionService session_service.SessionService) UserService {
+func NewUserService(
+	userRepo user_repository.UserRepository,
+	verifService verification_service.VerificationService,
+	sessionService session_service.SessionService,
+	firebaseService firebase_service.FirebaseService) UserService {
 	var doOnce sync.Once
 	service := new(UserServiceImpl)
 
 	doOnce.Do(func() {
 		service = &UserServiceImpl{
-			UserRepo:       userRepo,
-			VerifService:   verifService,
-			SessionService: sessionService,
+			UserRepo:        userRepo,
+			VerifService:    verifService,
+			FirebaseService: firebaseService,
+			SessionService:  sessionService,
 		}
 	})
 
@@ -132,14 +141,22 @@ func (service *UserServiceImpl) GetDetailUser(reqUser *request.UserRequest) (*jo
 	return result, nil
 }
 
-func (service *UserServiceImpl) UpdateUser(reqUser *request.UserRequest) (*response.UserResponse, error) {
+func (service *UserServiceImpl) UpdateUser(reqUser *request.UserRequest, profileImage *multipart.FileHeader) (*response.UserResponse, error) {
 
-	domainUserReq := &entity.Users{
-		UserId:       reqUser.UserId,
-		FullName:     reqUser.FullName,
-		ProfileImage: reqUser.ProfileImage,
-		Email:        reqUser.Email,
+	domainUserReq := new(entity.Users)
+	domainUserReq.UserId = reqUser.UserId
+	domainUserReq.FullName = reqUser.FullName
+
+	if profileImage != nil {
+		path := helper.GetUserProfileImagePath(reqUser.UserId)
+		resourcePath, err := service.FirebaseService.CreateResource(context.Background(), path, profileImage)
+		if err != nil {
+			return nil, err
+		}
+
+		domainUserReq.ProfileImage = &resourcePath
 	}
+
 	if err := service.UserRepo.UpdateUser(domainUserReq); err != nil {
 		return nil, err
 	}

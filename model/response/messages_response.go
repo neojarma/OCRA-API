@@ -24,6 +24,7 @@ const MessageUserIsAlreadyVerified = "user is already verified"
 // not authenticated
 const MessageMissingAuthToken = "missing auth token"
 const MessageExpiredAuthToken = "token expired"
+const MessageDifferentUserId = "requested id and cookie are not match"
 
 // resend email verification
 const MessageSuccessSendingNewToken = "new token has been sent"
@@ -71,3 +72,7 @@ const MessageAlreadyDislikeThisVideo = "already dislike this video"
 const MessageSuccesSubscribe = "success subsribe channel"
 const MessageSuccesUnsubscribe = "success unsubscribe channel"
 const MessageUserAlreadySubscribe = "user is already subsribe this channel"
+
+// user
+const MessageSuccessUpdateUserData = "resource updated successfully"
+const MessageFailedUpdateUserData = "failed updated resource"
