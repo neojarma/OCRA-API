@@ -4,6 +4,8 @@ package response
 const StatusSuccess = "success"
 const StatusFailed = "failed"
 
+const MessageErrorBindingData = "missmatch value type"
+
 // login messages
 const MessageSuccessLogin = "success login"
 const MessageWrongCredentials = "wrong credential"

@@ -34,12 +34,10 @@ func NewUserController(service user_service.UserService, cookieService cookie_se
 
 func (controller *UserControllerImpl) Login(ctx echo.Context) error {
 	req := new(request.AuthRequest)
-	ctx.Bind(req)
-
-	if err := helper.ValidateUserInput(req); err != nil {
+	if err := ctx.Bind(req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, &response.EmptyObjectDataResponse{
 			Status:  response.StatusFailed,
-			Message: err.Error(),
+			Message: response.MessageErrorBindingData,
 		})
 	}
 
@@ -100,7 +98,12 @@ func (controller *UserControllerImpl) Logout(ctx echo.Context) error {
 
 func (controller *UserControllerImpl) Register(ctx echo.Context) error {
 	req := new(request.UserRequest)
-	ctx.Bind(req)
+	if err := ctx.Bind(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, &response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: response.MessageErrorBindingData,
+		})
+	}
 
 	if err := helper.ValidateUserInput(req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, &response.EmptyObjectDataResponse{
@@ -111,6 +114,13 @@ func (controller *UserControllerImpl) Register(ctx echo.Context) error {
 
 	result, err := controller.Service.Register(req)
 	if err != nil {
+		if err.Error() == response.MessageFailedRegisterEmailExist {
+			return ctx.JSON(http.StatusConflict, &response.EmptyObjectDataResponse{
+				Status:  response.StatusFailed,
+				Message: err.Error(),
+			})
+		}
+
 		return ctx.JSON(http.StatusBadRequest, &response.EmptyObjectDataResponse{
 			Status:  response.StatusFailed,
 			Message: err.Error(),
