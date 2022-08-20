@@ -13,9 +13,9 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-func main() {
-	app := echo.New()
+var setupService *router.SetupService
 
+func init() {
 	// setup db connection
 	db, err := connection.GetConnection()
 	if err != nil {
@@ -40,14 +40,23 @@ func main() {
 	firebaseConfigClient := firebase_service.GetFirebaseStorageClient(context.Background())
 	firebaseService := firebase_service.NewFirebaseService(firebaseConfigClient)
 
-	group := app.Group("/api/v1")
+	setupService = &router.SetupService{
+		Db:              db,
+		Dialer:          dialer,
+		FirebaseService: firebaseService,
+	}
+}
 
-	group.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+func main() {
+	app := echo.New()
+	setupService.Group = app.Group("/api/v1")
+
+	setupService.Group.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowCredentials: true,
 		AllowOrigins:     []string{"https://web.ocra.neojarma.com"},
 	}))
 
-	router.Router(group, db, dialer, firebaseService)
+	router.Router(setupService)
 
 	app.Start(":8080")
 }
