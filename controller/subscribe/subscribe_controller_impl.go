@@ -43,7 +43,7 @@ func (controller *SubscribeControllerImpl) SubscribeChannel(ctx echo.Context) er
 		})
 	}
 
-	return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
+	return ctx.JSON(http.StatusOK, response.EmptyObjectDataResponse{
 		Status:  response.StatusSuccess,
 		Message: response.MessageSuccesSubscribe,
 	})
@@ -65,7 +65,7 @@ func (controller *SubscribeControllerImpl) UnsubscribeChannel(ctx echo.Context) 
 		})
 	}
 
-	return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
+	return ctx.JSON(http.StatusOK, response.EmptyObjectDataResponse{
 		Status:  response.StatusSuccess,
 		Message: response.MessageSuccesUnsubscribe,
 	})
