@@ -7,4 +7,6 @@ type ChoiceService interface {
 	IsUserLikeTheVideo(req *entity.Likes) bool
 	CreateDislikeRecord(req *entity.Dislikes) error
 	IsUserDislikeTheVideo(req *entity.Dislikes) bool
+	DeleteLike(req *entity.Likes) error
+	DeleteDislike(req *entity.Dislikes) error
 }
