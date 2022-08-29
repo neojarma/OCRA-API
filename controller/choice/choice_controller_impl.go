@@ -72,3 +72,49 @@ func (controller *ChoiceControllerImpl) CreateDislike(ctx echo.Context) error {
 		Message: response.MessageSuccessDislikeVideo,
 	})
 }
+
+func (controller *ChoiceControllerImpl) DeleteLike(ctx echo.Context) error {
+	req := new(entity.Likes)
+
+	if err := ctx.Bind(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
+
+	if err := controller.Service.DeleteLike(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, response.EmptyObjectDataResponse{
+		Status:  response.StatusSuccess,
+		Message: response.MessageSuccessDeleteLike,
+	})
+}
+
+func (controller *ChoiceControllerImpl) DeleteDislike(ctx echo.Context) error {
+	req := new(entity.Dislikes)
+
+	if err := ctx.Bind(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
+
+	if err := controller.Service.DeleteDislike(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, response.EmptyObjectDataResponse{
+		Status:  response.StatusSuccess,
+		Message: response.MessageSuccessDeleteDislike,
+	})
+}

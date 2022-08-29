@@ -50,10 +50,10 @@ type SetupService struct {
 
 func Router(setup *SetupService) {
 
-	sessionCache := cache.New(time.Hour*72, time.Hour*120)
+	setup.SessionCache = cache.New(time.Hour*72, time.Hour*120)
 
 	repo := session_repository.NewSessionRepository(setup.Db)
-	service := session_service.NewSessionService(repo, sessionCache)
+	service := session_service.NewSessionService(repo, setup.SessionCache)
 	setup.RenewMiddleware = renew_session.NewRenewSession(service)
 
 	setup.AuthMiddleware = auth_middleware.NewAuthMiddleware(service)
@@ -153,6 +153,8 @@ func UserChoiceRoute(setup *SetupService) choice_controller.ChoiceController {
 
 	setup.Group.POST("/like", controller.CreateLike)
 	setup.Group.POST("/dislike", controller.CreateDislike)
+	setup.Group.DELETE("/like", controller.DeleteLike)
+	setup.Group.DELETE("/dislike", controller.DeleteDislike)
 
 	return controller
 }

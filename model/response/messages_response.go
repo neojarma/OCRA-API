@@ -67,6 +67,9 @@ const MessageSuccesLikeVideo = "success like video"
 const MessageSuccessDislikeVideo = "success dislike video"
 const MessageAlreadyLikeThisVideo = "already like this video"
 const MessageAlreadyDislikeThisVideo = "already dislike this video"
+const MessageSuccessDeleteLike = "success delete like record"
+const MessageSuccessDeleteDislike = "success delete dislike record"
+
 
 // subscribe
 const MessageSuccesSubscribe = "success subsribe channel"

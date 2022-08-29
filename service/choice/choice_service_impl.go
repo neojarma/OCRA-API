@@ -72,3 +72,17 @@ func (service *ChoiceServiceImpl) IsUserDislikeTheVideo(req *entity.Dislikes) bo
 		VideoId: req.VideoId,
 	})
 }
+
+func (service *ChoiceServiceImpl) DeleteLike(req *entity.Likes) error {
+	return service.LikeRepo.DeleteLike(&entity.Likes{
+		UserId:  req.UserId,
+		VideoId: req.VideoId,
+	})
+}
+
+func (service *ChoiceServiceImpl) DeleteDislike(req *entity.Dislikes) error {
+	return service.DislikeRepo.DeleteDislike(&entity.Dislikes{
+		UserId:  req.UserId,
+		VideoId: req.VideoId,
+	})
+}
