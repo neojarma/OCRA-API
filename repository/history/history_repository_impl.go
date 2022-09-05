@@ -2,6 +2,7 @@ package watchlater_repository
 
 import (
 	"errors"
+	"log"
 	"ocra_server/model/entity"
 	joins_model "ocra_server/model/joins"
 	"ocra_server/model/response"
@@ -10,16 +11,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type WatchLaterRepositoryImpl struct {
+type HistoryRepositoryImpl struct {
 	Db *gorm.DB
 }
 
-func NewWatchLateRepository(db *gorm.DB) WatchLaterRepository {
+func NewHistoryRepository(db *gorm.DB) HistoryRepository {
 	var doOnce sync.Once
-	repo := new(WatchLaterRepositoryImpl)
+	repo := new(HistoryRepositoryImpl)
 
 	doOnce.Do(func() {
-		repo = &WatchLaterRepositoryImpl{
+		repo = &HistoryRepositoryImpl{
 			Db: db,
 		}
 	})
@@ -27,17 +28,17 @@ func NewWatchLateRepository(db *gorm.DB) WatchLaterRepository {
 	return repo
 }
 
-func (repository *WatchLaterRepositoryImpl) IsRecordAlreadyExist(req *entity.Watch_Laters) error {
+func (repository *HistoryRepositoryImpl) IsRecordAlreadyExist(req *entity.Histories) error {
 	isExist := repository.Db.Where("video_id = ? ", req.VideoId).Where("user_id = ?", req.UserId).Find(req).RowsAffected != 0
 
 	if isExist {
-		return errors.New(response.MessageFailedWatchLaterRecordExist)
+		return errors.New(response.MessageFailedHistoryRecordExist)
 	}
 
 	return nil
 }
 
-func (repository *WatchLaterRepositoryImpl) CreateWatchRecord(req *entity.Watch_Laters) error {
+func (repository *HistoryRepositoryImpl) CreateHistoryRecord(req *entity.Histories) error {
 	if !repository.isChannelHasThisVideo(req.ChannelId, req.VideoId) {
 		return errors.New(response.MessageFailedInsertWacthRecord)
 	}
@@ -45,27 +46,24 @@ func (repository *WatchLaterRepositoryImpl) CreateWatchRecord(req *entity.Watch_
 	return repository.Db.Create(req).Error
 }
 
-func (repository *WatchLaterRepositoryImpl) GetAllWatchLaterRecord(req *entity.Watch_Laters) ([]*joins_model.WatchLaterJoins, error) {
-	joinModel := make([]*joins_model.WatchLaterJoins, 0)
+func (repository *HistoryRepositoryImpl) GetAllHistoryLaterRecord(req *entity.Histories) ([]*joins_model.HistoryJoins, error) {
+	joinModel := make([]*joins_model.HistoryJoins, 0)
 
-	err := repository.Db.Model(req).Select("watch_laters.watch_id", "watch_laters.video_id", "watch_laters.channel_id", "videos.thumbnail", "videos.title", "channels.name").Joins("JOIN videos ON watch_laters.video_id = videos.video_id").Joins("JOIN channels ON watch_laters.channel_id = channels.channel_id").Where("watch_laters.user_id = ?", req.UserId).Find(&joinModel).Error
+	err := repository.Db.Model(req).Select("histories.history_id", "videos.video_id", "videos.title", "videos.thumbnail", "videos.video", "videos.description", "videos.created_at", "videos.views_count", "channels.channel_id", "channels.name").Joins("JOIN videos ON histories.video_id = videos.video_id").Joins("JOIN channels ON histories.channel_id = channels.channel_id").Where("histories.user_id = ?", req.UserId).Find(&joinModel).Error
 
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
 	return joinModel, nil
 }
 
-func (repository *WatchLaterRepositoryImpl) IsRecordExist(req *entity.Watch_Laters) bool {
-	return repository.Db.Where("video_id = ? ", req.VideoId).Where("channel_id = ?", req.ChannelId).Find(req).RowsAffected == 1
-}
-
-func (repository *WatchLaterRepositoryImpl) isChannelHasThisVideo(channelId, videoId string) bool {
+func (repository *HistoryRepositoryImpl) isChannelHasThisVideo(channelId, videoId string) bool {
 	videoModel := new(entity.Videos)
 	return repository.Db.Where("video_id = ? ", videoId).Where("channel_id = ?", channelId).Find(videoModel).RowsAffected == 1
 }
 
-func (repository *WatchLaterRepositoryImpl) DeleteWatchRecord(req *entity.Watch_Laters) error {
-	return repository.Db.Where("watch_id = ?", req.WatchId).Delete(req).Error
+func (repository *HistoryRepositoryImpl) DeleteHistoryRecord(req *entity.Histories) error {
+	return repository.Db.Where("history_id = ?", req.HistoryId).Delete(req).Error
 }
