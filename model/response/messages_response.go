@@ -86,3 +86,10 @@ const MessageSuccessGetAllWatchLaterRecord = "success get all record"
 const MessageSuccessCreateWatchLaterRecord = "success create new record"
 const MessageSuccessDeleteWatchLaterRecord = "success delete record"
 const MessageFailedResourceExist = "resource already exist"
+
+// watch later
+const MessageFailedHistoryRecordExist = "requested data already exist"
+const MessageFailedInsertHistory = "invalid channel id or video id"
+const MessageSuccessGetAllHistoryRecord = "success get all record"
+const MessageSuccessCreateHistoryRecord = "success create new record"
+const MessageSuccessDeleteHistoryRecord = "success delete record"

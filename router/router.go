@@ -4,6 +4,7 @@ import (
 	channel_controller "ocra_server/controller/channel"
 	choice_controller "ocra_server/controller/choice"
 	comment_controller "ocra_server/controller/comment"
+	history_controller "ocra_server/controller/history"
 	subscriber_controller "ocra_server/controller/subscribe"
 	user_controller "ocra_server/controller/user"
 	verification_controller "ocra_server/controller/verification"
@@ -14,6 +15,7 @@ import (
 	channel_repository "ocra_server/repository/channels"
 	comment_repository "ocra_server/repository/comment"
 	dislike_repository "ocra_server/repository/dislike"
+	history_repository "ocra_server/repository/history"
 	like_repository "ocra_server/repository/like"
 	session_repository "ocra_server/repository/session"
 	subscribe_repository "ocra_server/repository/subscribe"
@@ -26,6 +28,7 @@ import (
 	comment_service "ocra_server/service/comment"
 	cookie_service "ocra_server/service/cookie"
 	firebase_service "ocra_server/service/firebase"
+	history_service "ocra_server/service/history"
 	mail_service "ocra_server/service/mail"
 	session_service "ocra_server/service/session"
 	subscribe_service "ocra_server/service/subscribe"
@@ -71,6 +74,7 @@ func Router(setup *SetupService) {
 	UserChoiceRoute(setup)
 	SubscribeRoute(setup)
 	WatchLaterRoute(setup)
+	HistoryRoute(setup)
 }
 
 func UserRoute(setup *SetupService) user_controller.UserController {
@@ -182,6 +186,18 @@ func WatchLaterRoute(setup *SetupService) watchlater_controller.WatchLaterContro
 	setup.Group.GET("/watch-later", controller.GetAllWatchLaterRecords, setup.AuthMiddleware.Auth)
 	setup.Group.POST("/watch-later", controller.CreateWatchLaterRecord, setup.AuthMiddleware.Auth)
 	setup.Group.DELETE("/watch-later", controller.DeleteWatchLaterRecord, setup.AuthMiddleware.Auth)
+
+	return controller
+}
+
+func HistoryRoute(setup *SetupService) history_controller.HistoryController {
+	repo := history_repository.NewHistoryRepository(setup.Db)
+	service := history_service.NewHistoryService(repo)
+	controller := history_controller.NewHistoryController(service)
+
+	setup.Group.GET("/history", controller.GetAllHistoryRecords, setup.AuthMiddleware.Auth)
+	setup.Group.POST("/history", controller.CreateHistoryRecord, setup.AuthMiddleware.Auth)
+	setup.Group.DELETE("/history", controller.DeleteHistoryRecord, setup.AuthMiddleware.Auth)
 
 	return controller
 }
