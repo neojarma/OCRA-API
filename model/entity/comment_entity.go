@@ -5,5 +5,5 @@ type Comments struct {
 	VideoId   string `json:"videoId"`
 	ChannelId string `json:"channelId"`
 	Comment   string `json:"comment"`
-	CreatedAt string `json:"createdAt" gorm:"autoCreateTime:milli"`
+	CreatedAt int64  `json:"createdAt" gorm:"autoCreateTime:milli"`
 }

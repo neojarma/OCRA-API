@@ -67,5 +67,5 @@ func (repository *CommentRepositoryImpl) UpdateComment(req *entity.Comments) err
 }
 
 func (repository *CommentRepositoryImpl) DeleteComment(req *entity.Comments) error {
-	return repository.Db.Where("comment_id = ? ", req.CommentId).Where("channel_id = ?", req.ChannelId).Delete(req).Error
+	return repository.Db.Where("comment_id = ? ", req.CommentId).Delete(req).Error
 }

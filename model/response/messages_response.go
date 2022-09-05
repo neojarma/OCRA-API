@@ -70,7 +70,6 @@ const MessageAlreadyDislikeThisVideo = "already dislike this video"
 const MessageSuccessDeleteLike = "success delete like record"
 const MessageSuccessDeleteDislike = "success delete dislike record"
 
-
 // subscribe
 const MessageSuccesSubscribe = "success subsribe channel"
 const MessageSuccesUnsubscribe = "success unsubscribe channel"
@@ -79,3 +78,11 @@ const MessageUserAlreadySubscribe = "user is already subsribe this channel"
 // user
 const MessageSuccessUpdateUserData = "resource updated successfully"
 const MessageFailedUpdateUserData = "failed updated resource"
+
+// watch later
+const MessageFailedWatchLaterRecordExist = "requested data already exist"
+const MessageFailedInsertWacthRecord = "invalid channel id or video id"
+const MessageSuccessGetAllWatchLaterRecord = "success get all record"
+const MessageSuccessCreateWatchLaterRecord = "success create new record"
+const MessageSuccessDeleteWatchLaterRecord = "success delete record"
+const MessageFailedResourceExist = "resource already exist"
