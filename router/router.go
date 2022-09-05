@@ -8,6 +8,7 @@ import (
 	user_controller "ocra_server/controller/user"
 	verification_controller "ocra_server/controller/verification"
 	video_controller "ocra_server/controller/video"
+	watchlater_controller "ocra_server/controller/watch_later"
 	auth_middleware "ocra_server/middleware/auth"
 	"ocra_server/middleware/renew_session"
 	channel_repository "ocra_server/repository/channels"
@@ -19,6 +20,7 @@ import (
 	user_repository "ocra_server/repository/user"
 	verification_repository "ocra_server/repository/verification"
 	videos_repository "ocra_server/repository/video"
+	watchlater_repository "ocra_server/repository/watch_later"
 	channel_service "ocra_server/service/channel"
 	choice_service "ocra_server/service/choice"
 	comment_service "ocra_server/service/comment"
@@ -30,6 +32,7 @@ import (
 	user_service "ocra_server/service/user"
 	verification_service "ocra_server/service/verification"
 	video_service "ocra_server/service/video"
+	watchlater_service "ocra_server/service/watch_later"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -67,6 +70,7 @@ func Router(setup *SetupService) {
 	CommentRoute(setup)
 	UserChoiceRoute(setup)
 	SubscribeRoute(setup)
+	WatchLaterRoute(setup)
 }
 
 func UserRoute(setup *SetupService) user_controller.UserController {
@@ -166,6 +170,18 @@ func SubscribeRoute(setup *SetupService) subscriber_controller.SubscribeControll
 
 	setup.Group.POST("/subs", controller.SubscribeChannel)
 	setup.Group.POST("/unsubs", controller.UnsubscribeChannel)
+
+	return controller
+}
+
+func WatchLaterRoute(setup *SetupService) watchlater_controller.WatchLaterController {
+	repo := watchlater_repository.NewWatchLateRepository(setup.Db)
+	service := watchlater_service.NewWatchLaterService(repo)
+	controller := watchlater_controller.NewWatchLaterController(service)
+
+	setup.Group.GET("/watch-later", controller.GetAllWatchLaterRecords, setup.AuthMiddleware.Auth)
+	setup.Group.POST("/watch-later", controller.CreateWatchLaterRecord, setup.AuthMiddleware.Auth)
+	setup.Group.DELETE("/watch-later", controller.DeleteWatchLaterRecord, setup.AuthMiddleware.Auth)
 
 	return controller
 }
