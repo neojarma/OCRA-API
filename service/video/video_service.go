@@ -13,4 +13,5 @@ type VideoService interface {
 	GetDetailVideos(req *request.DetailVideoRequest) (*joins_model.DetailVideoJoin, error)
 	CreateVideo(req *entity.Video, thumbnail, video *multipart.FileHeader) (*entity.Video, error)
 	UpdateVideo(req *entity.Videos) (*entity.Videos, error)
+	IncrementViewsVideo(videoId string) error
 }

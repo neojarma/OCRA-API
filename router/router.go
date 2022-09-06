@@ -125,6 +125,7 @@ func VideoRoute(setup *SetupService) video_controller.VideoController {
 	setup.Group.GET("/videos", controller.GetAllVideos)
 	setup.Group.GET("/video", controller.GetDetailVideos)
 	setup.Group.POST("/video", controller.CreateVideo)
+	setup.Group.POST("/video/view/:id", controller.IncrementViews)
 
 	return controller
 }

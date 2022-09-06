@@ -9,4 +9,5 @@ type VideoController interface {
 	GetDetailVideos(ctx echo.Context) error
 	CreateVideo(ctx echo.Context) error
 	UpdateVideo(ctx echo.Context) error
+	IncrementViews(ctx echo.Context) error
 }

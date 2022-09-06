@@ -93,3 +93,8 @@ func (repository *VideosRepositoryImpl) CreateVideo(req *entity.Video) error {
 func (repository *VideosRepositoryImpl) UpdateVideo(req *entity.Video) error {
 	return nil
 }
+
+func (repository *VideosRepositoryImpl) IncrementViewsCount(videoId string) error {
+	model := new(entity.Videos)
+	return repository.Db.Model(model).Where("video_id = ? ", videoId).UpdateColumn("views_count", gorm.Expr("views_count + ?", 1)).Error
+}

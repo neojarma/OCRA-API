@@ -141,3 +141,26 @@ func (controller *VideoControllerImpl) CreateVideo(ctx echo.Context) error {
 func (controller *VideoControllerImpl) UpdateVideo(ctx echo.Context) error {
 	return nil
 }
+
+func (controller *VideoControllerImpl) IncrementViews(ctx echo.Context) error {
+	videoId := ctx.Param("id")
+
+	if videoId == "" {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: response.MessageMissingVideoId,
+		})
+	}
+
+	if err := controller.Service.IncrementViewsVideo(videoId); err != nil {
+		ctx.JSON(http.StatusInternalServerError, response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, response.EmptyObjectDataResponse{
+		Status:  response.StatusSuccess,
+		Message: response.MessageSuccessUpdateViews,
+	})
+}
