@@ -39,7 +39,7 @@ func (middleware *RenewSessionImpl) RenewSession(next echo.HandlerFunc) echo.Han
 			return next(c)
 		}
 
-		result, err := middleware.SessionService.CheckActiveSession(sessionId)
+		session, err := middleware.SessionService.CheckActiveSession(sessionId)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, &response.EmptyObjectDataResponse{
 				Status:  response.StatusFailed,
@@ -47,7 +47,9 @@ func (middleware *RenewSessionImpl) RenewSession(next echo.HandlerFunc) echo.Han
 			})
 		}
 
-		isSessionNearlyExpired := time.Now().UnixMilli()-result.ExpiresAt <= int64(time.Minute)*30
+		c.Request().Header.Add("user-id", session.UserId)
+
+		isSessionNearlyExpired := time.Now().UnixMilli()-session.ExpiresAt <= int64(time.Minute)*30
 		if isSessionNearlyExpired {
 			middleware.SessionService.UpdateExpiresSession(sessionId)
 			return next(c)

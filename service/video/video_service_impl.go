@@ -12,6 +12,7 @@ import (
 	choice_service "ocra_server/service/choice"
 	firebase_service "ocra_server/service/firebase"
 	subscribe_service "ocra_server/service/subscribe"
+	"strconv"
 	"sync"
 )
 
@@ -42,27 +43,32 @@ func NewVideoService(
 	return service
 }
 
-func (service *VideoServiceImpl) GetAllVideos(page, limitReq string) (*response.VideosResponse, error) {
-	totalRows := make(chan int64)
-	defer close(totalRows)
+func (service *VideoServiceImpl) GetAllVideos(req *request.AllVideosRequest) (*response.VideosResponse, error) {
+	offset, limit, newPage := helper.ParseOffsetValue(req.Page, req.Size)
 
-	offset, limit, newPage := helper.ParseOffsetValue(page, limitReq)
+	res, err := strconv.ParseBool(req.IsSubscribed)
+	if err == nil && res {
+		subscribedList, err := service.Repo.GetAllSubscribedVideos(offset, limit, req.UserId)
+		if err != nil {
+			return nil, err
+		}
 
-	resultVideos, err := service.Repo.GetAllVideos(offset, limit)
+		return &response.VideosResponse{
+			Page:   newPage,
+			Limit:  limit,
+			Videos: subscribedList,
+		}, nil
+	}
+
+	allVids, err := service.Repo.GetAllVideos(offset, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	go func() {
-		totalRows <- service.Repo.CountTotalRows()
-	}()
-
-	rows := <-totalRows
 	return &response.VideosResponse{
-		Page:        newPage,
-		Limit:       limit,
-		TotalVideos: rows,
-		Videos:      resultVideos,
+		Page:   newPage,
+		Limit:  limit,
+		Videos: allVids,
 	}, nil
 }
 

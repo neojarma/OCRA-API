@@ -6,6 +6,7 @@ import (
 	"ocra_server/model/request"
 	"ocra_server/model/response"
 	videos_service "ocra_server/service/video"
+	"strconv"
 	"sync"
 
 	"github.com/labstack/echo/v4"
@@ -29,10 +30,28 @@ func NewVideoController(service videos_service.VideoService) VideoController {
 }
 
 func (controller *VideoControllerImpl) GetAllVideos(ctx echo.Context) error {
-	page := ctx.QueryParam("page")
-	size := ctx.QueryParam("size")
+	req := new(request.AllVideosRequest)
+	if err := ctx.Bind(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyArrayDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
 
-	result, err := controller.Service.GetAllVideos(page, size)
+	ok, err := strconv.ParseBool(req.IsSubscribed)
+	if err == nil && ok {
+		userIdFromCookie := ctx.Request().Header.Get("user-id")
+		if userIdFromCookie == "" {
+			return ctx.JSON(http.StatusBadRequest, response.EmptyArrayDataResponse{
+				Status:  response.StatusFailed,
+				Message: response.MessageMissingSessionId,
+			})
+		}
+
+		req.UserId = userIdFromCookie
+	}
+
+	result, err := controller.Service.GetAllVideos(req)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, response.EmptyArrayDataResponse{
 			Status:  response.StatusFailed,

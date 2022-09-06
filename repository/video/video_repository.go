@@ -7,6 +7,7 @@ import (
 
 type VideosRepository interface {
 	GetAllVideos(offset, limit int) ([]*joins_model.HomeVideoJoin, error)
+	GetAllSubscribedVideos(offset, limit int, userId string) ([]*joins_model.HomeVideoJoin, error)
 	GetDetailVideos(videoId string) (*joins_model.DetailVideoJoin, error)
 	CountTotalRows() int64
 	CreateVideo(req *entity.Video) error
