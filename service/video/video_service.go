@@ -9,7 +9,7 @@ import (
 )
 
 type VideoService interface {
-	GetAllVideos(page, limit string) (*response.VideosResponse, error)
+	GetAllVideos(req *request.AllVideosRequest) (*response.VideosResponse, error)
 	GetDetailVideos(req *request.DetailVideoRequest) (*joins_model.DetailVideoJoin, error)
 	CreateVideo(req *entity.Video, thumbnail, video *multipart.FileHeader) (*entity.Video, error)
 	UpdateVideo(req *entity.Videos) (*entity.Videos, error)

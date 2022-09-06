@@ -43,6 +43,20 @@ func (repository *VideosRepositoryImpl) GetAllVideos(offset, limit int) ([]*join
 	return joinModel, nil
 }
 
+func (repository *VideosRepositoryImpl) GetAllSubscribedVideos(offset, limit int, userId string) ([]*joins_model.HomeVideoJoin, error) {
+	videoModel := new(entity.Videos)
+	joinModel := make([]*joins_model.HomeVideoJoin, 0)
+
+	paginationFunc := helper.GetPaginationFunc(repository.Db, offset, limit)
+
+	err := repository.Db.Model(videoModel).Select("videos.video_id", "videos.channel_id", "videos.thumbnail", "videos.video", "videos.title", "videos.created_at", "videos.views_count", "channels.channel_id", "channels.name", "channels.profile_image").Joins("JOIN channels on videos.channel_id = channels.channel_id").Joins("JOIN subscribes ON subscribes.channel_id = videos.channel_id").Where("subscribes.user_id = ? ", userId).Scopes(paginationFunc).Find(&joinModel).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return joinModel, nil
+}
+
 func (repository *VideosRepositoryImpl) CountTotalRows() int64 {
 	videoModel := make([]entity.Videos, 0)
 
