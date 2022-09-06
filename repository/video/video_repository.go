@@ -12,4 +12,5 @@ type VideosRepository interface {
 	CountTotalRows() int64
 	CreateVideo(req *entity.Video) error
 	UpdateVideo(req *entity.Video) error
+	IncrementViewsCount(videoId string) error
 }

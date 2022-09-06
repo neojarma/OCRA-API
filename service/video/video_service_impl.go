@@ -138,3 +138,7 @@ func (service *VideoServiceImpl) CreateVideo(req *entity.Video, thumbnail, video
 func (service *VideoServiceImpl) UpdateVideo(req *entity.Videos) (*entity.Videos, error) {
 	return nil, nil
 }
+
+func (service *VideoServiceImpl) IncrementViewsVideo(videoId string) error {
+	return service.Repo.IncrementViewsCount(videoId)
+}

@@ -47,6 +47,8 @@ const MessageMissingThumbnail = "missing thumbnail in form request"
 const MessageMissingVideo = "missing video in form request"
 const MessageSuccesUploadVideo = "succes upload video"
 const MessageNoVideo = "there is no video with this id"
+const MessageMissingVideoId = "missing video id"
+const MessageSuccessUpdateViews = "success update views count"
 
 // channels
 const MessageNoChannelWithID = "theres is no channel with this id"
