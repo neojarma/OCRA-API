@@ -15,6 +15,7 @@ import (
 	channel_repository "ocra_server/repository/channels"
 	comment_repository "ocra_server/repository/comment"
 	dislike_repository "ocra_server/repository/dislike"
+	elasticsearch_repository "ocra_server/repository/elasticsearch"
 	history_repository "ocra_server/repository/history"
 	like_repository "ocra_server/repository/like"
 	session_repository "ocra_server/repository/session"
@@ -27,6 +28,7 @@ import (
 	choice_service "ocra_server/service/choice"
 	comment_service "ocra_server/service/comment"
 	cookie_service "ocra_server/service/cookie"
+	elasticsearch_service "ocra_server/service/elasticsearch"
 	firebase_service "ocra_server/service/firebase"
 	history_service "ocra_server/service/history"
 	mail_service "ocra_server/service/mail"
@@ -38,6 +40,7 @@ import (
 	watchlater_service "ocra_server/service/watch_later"
 	"time"
 
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/patrickmn/go-cache"
 	"gopkg.in/gomail.v2"
@@ -52,6 +55,7 @@ type SetupService struct {
 	SessionCache    *cache.Cache
 	AuthMiddleware  auth_middleware.AuthMiddleware
 	RenewMiddleware renew_session.RenewSession
+	ESClient        *elasticsearch.Client
 }
 
 func Router(setup *SetupService) {
@@ -118,14 +122,19 @@ func VideoRoute(setup *SetupService) video_controller.VideoController {
 	subsRepo := subscribe_repository.NewSubsRepository(setup.Db)
 	subsService := subscribe_service.NewSubsService(subsRepo)
 
+	esrepo := elasticsearch_repository.NewElasticsearchRepository(setup.ESClient)
+	esservice := elasticsearch_service.NewElasticsearchService(esrepo)
+
 	repo := videos_repository.NewVideosRepository(setup.Db)
-	service := video_service.NewVideoService(repo, setup.FirebaseService, subsService, choiceService)
+	service := video_service.NewVideoService(repo, setup.FirebaseService, subsService, choiceService, esservice)
 	controller := video_controller.NewVideoController(service)
 
 	setup.Group.GET("/videos", controller.GetAllVideos)
 	setup.Group.GET("/video", controller.GetDetailVideos)
 	setup.Group.POST("/video", controller.CreateVideo)
 	setup.Group.POST("/video/view/:id", controller.IncrementViews)
+	setup.Group.GET("/video/find", controller.Find)
+	setup.Group.GET("/auto-complete", controller.AutoComplete)
 
 	return controller
 }

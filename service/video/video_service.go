@@ -14,4 +14,6 @@ type VideoService interface {
 	CreateVideo(req *entity.Video, thumbnail, video *multipart.FileHeader) (*entity.Video, error)
 	UpdateVideo(req *entity.Videos) (*entity.Videos, error)
 	IncrementViewsVideo(videoId string) error
+	Find(query string) ([]*joins_model.HomeVideoJoin, error)
+	AutoComplete(query string) ([]string, error)
 }

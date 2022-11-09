@@ -10,10 +10,12 @@ import (
 	"ocra_server/model/response"
 	videos_repository "ocra_server/repository/video"
 	choice_service "ocra_server/service/choice"
+	elasticsearch_service "ocra_server/service/elasticsearch"
 	firebase_service "ocra_server/service/firebase"
 	subscribe_service "ocra_server/service/subscribe"
 	"strconv"
 	"sync"
+	"time"
 )
 
 type VideoServiceImpl struct {
@@ -21,13 +23,15 @@ type VideoServiceImpl struct {
 	FirebaseService  firebase_service.FirebaseService
 	SubscribeService subscribe_service.SubscribeService
 	ChoiceService    choice_service.ChoiceService
+	ES               elasticsearch_service.ElasticsearchService
 }
 
 func NewVideoService(
 	repo videos_repository.VideosRepository,
 	firebaseService firebase_service.FirebaseService,
 	subsService subscribe_service.SubscribeService,
-	choiceService choice_service.ChoiceService) VideoService {
+	choiceService choice_service.ChoiceService,
+	es elasticsearch_service.ElasticsearchService) VideoService {
 	var doOnce sync.Once
 	service := new(VideoServiceImpl)
 
@@ -37,6 +41,7 @@ func NewVideoService(
 			FirebaseService:  firebaseService,
 			SubscribeService: subsService,
 			ChoiceService:    choiceService,
+			ES:               es,
 		}
 	})
 
@@ -132,6 +137,19 @@ func (service *VideoServiceImpl) CreateVideo(req *entity.Video, thumbnail, video
 		return nil, err
 	}
 
+	// insert to elasticsearch
+	newESRecord := entity.ElasticsearchVideo{
+		VideoId:    req.VideoId,
+		VideoTitle: req.Title,
+		VideoDesc:  req.Description,
+		VideoTags:  req.Tags,
+		CreatedAt:  time.Now().UnixMilli(),
+	}
+
+	if err = service.ES.AddDocument(&newESRecord); err != nil {
+		return nil, err
+	}
+
 	return req, nil
 }
 
@@ -141,4 +159,17 @@ func (service *VideoServiceImpl) UpdateVideo(req *entity.Videos) (*entity.Videos
 
 func (service *VideoServiceImpl) IncrementViewsVideo(videoId string) error {
 	return service.Repo.IncrementViewsCount(videoId)
+}
+
+func (service *VideoServiceImpl) Find(query string) ([]*joins_model.HomeVideoJoin, error) {
+	res, err := service.ES.Find(query)
+	if err != nil {
+		return nil, err
+	}
+
+	return service.Repo.Find(res...)
+}
+
+func (service *VideoServiceImpl) AutoComplete(query string) ([]string, error) {
+	return service.ES.AutoComplete(query)
 }
