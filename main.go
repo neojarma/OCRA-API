@@ -7,7 +7,9 @@ import (
 	firebase_service "ocra_server/service/firebase"
 	"os"
 	"strconv"
+	"strings"
 
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gopkg.in/gomail.v2"
@@ -40,10 +42,21 @@ func init() {
 	firebaseConfigClient := firebase_service.GetFirebaseStorageClient(context.Background())
 	firebaseService := firebase_service.NewFirebaseService(firebaseConfigClient)
 
+	// setup elasticsearch client
+	config := elasticsearch.Config{
+		Addresses: strings.Split(os.Getenv("ES_ADDRESSES"), ","),
+	}
+
+	es, err := elasticsearch.NewClient(config)
+	if err != nil {
+		panic(err)
+	}
+
 	setupService = &router.SetupService{
 		Db:              db,
 		Dialer:          dialer,
 		FirebaseService: firebaseService,
+		ESClient:        es,
 	}
 }
 

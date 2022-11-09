@@ -10,4 +10,6 @@ type VideoController interface {
 	CreateVideo(ctx echo.Context) error
 	UpdateVideo(ctx echo.Context) error
 	IncrementViews(ctx echo.Context) error
+	Find(ctx echo.Context) error
+	AutoComplete(ctx echo.Context) error
 }

@@ -164,3 +164,61 @@ func (controller *VideoControllerImpl) IncrementViews(ctx echo.Context) error {
 		Message: response.MessageSuccessUpdateViews,
 	})
 }
+
+func (controller *VideoControllerImpl) Find(ctx echo.Context) error {
+	query := ctx.QueryParam("query")
+
+	if query == "" {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: response.MessageMissingVideoQuery,
+		})
+	}
+
+	result, err := controller.Service.Find(query)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyArrayDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, response.Response{
+		Status:  response.StatusSuccess,
+		Message: response.MessageSuccesGetAllVideos,
+		Data:    result,
+	})
+}
+
+func (controller *VideoControllerImpl) AutoComplete(ctx echo.Context) error {
+	query := ctx.QueryParam("query")
+
+	if query == "" {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyObjectDataResponse{
+			Status:  response.StatusFailed,
+			Message: response.MessageMissingVideoQuery,
+		})
+	}
+
+	result, err := controller.Service.AutoComplete(query)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.EmptyArrayDataResponse{
+			Status:  response.StatusFailed,
+			Message: err.Error(),
+		})
+	}
+
+	if len(result) == 0 {
+		return ctx.JSON(http.StatusOK, response.Response{
+			Status:  response.StatusSuccess,
+			Message: response.MessageNoSuggestions,
+			Data:    result,
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, response.Response{
+		Status:  response.StatusSuccess,
+		Message: response.MessageSuccesGetSuggestions,
+		Data:    result,
+	})
+}

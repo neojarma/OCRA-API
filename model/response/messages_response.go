@@ -49,6 +49,9 @@ const MessageSuccesUploadVideo = "succes upload video"
 const MessageNoVideo = "there is no video with this id"
 const MessageMissingVideoId = "missing video id"
 const MessageSuccessUpdateViews = "success update views count"
+const MessageMissingVideoQuery = "missing video query"
+const MessageSuccesGetSuggestions = "success get suggestions"
+const MessageNoSuggestions = "there is no suggestions"
 
 // channels
 const MessageNoChannelWithID = "theres is no channel with this id"

@@ -98,3 +98,15 @@ func (repository *VideosRepositoryImpl) IncrementViewsCount(videoId string) erro
 	model := new(entity.Videos)
 	return repository.Db.Model(model).Where("video_id = ? ", videoId).UpdateColumn("views_count", gorm.Expr("views_count + ?", 1)).Error
 }
+
+func (repository *VideosRepositoryImpl) Find(videosId ...string) ([]*joins_model.HomeVideoJoin, error) {
+	videoModel := new(entity.Videos)
+	joinModel := make([]*joins_model.HomeVideoJoin, 0)
+
+	err := repository.Db.Model(videoModel).Select("videos.video_id", "videos.channel_id", "videos.thumbnail", "videos.video", "videos.title", "videos.created_at", "videos.views_count", "channels.channel_id", "channels.name", "channels.profile_image").Joins("JOIN channels on videos.channel_id = channels.channel_id").Where("videos.video_id IN ?", videosId).Find(&joinModel).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return joinModel, nil
+}

@@ -13,4 +13,5 @@ type VideosRepository interface {
 	CreateVideo(req *entity.Video) error
 	UpdateVideo(req *entity.Video) error
 	IncrementViewsCount(videoId string) error
+	Find(videosId ...string) ([]*joins_model.HomeVideoJoin, error)
 }
