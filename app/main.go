@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"ocra_server/connection"
 	"ocra_server/router"
 	firebase_service "ocra_server/service/firebase"
@@ -57,6 +58,8 @@ func init() {
 		FirebaseService: firebaseService,
 		ESClient:        es,
 	}
+
+	log.Println("server ready")
 }
 
 func main() {
