@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  app:
+    build: ./app
+    restart: always
+    ports: 
+      - "8080:80"
+    container_name: ocra-api
+    image: ocra-api
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - HOST=${HOST}
+      - SCHEMA=${SCHEMA}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_EMAIL=${SMTP_EMAIL}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - CORS_DOMAIN=${CORS_DOMAIN}
+      - FIREBASE_CONFIG=${FIREBASE_CONFIG}
+      - FIREBASE_BUCKET_NAME=${FIREBASE_BUCKET_NAME}
+      - ES_INDEX=${ES_INDEX}
+      - ES_ADDRESSES=${ES_ADDRESSES}
+  
+  ocra-mysql:
+    image: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    container_name: ocra-mysql
+
+  ocra-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.0
+    container_name: ocra-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300

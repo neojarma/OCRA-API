@@ -11,7 +11,6 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"gopkg.in/gomail.v2"
 )
 
@@ -64,12 +63,12 @@ func main() {
 	app := echo.New()
 	setupService.Group = app.Group("/api/v1")
 
-	setupService.Group.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowCredentials: true,
-		AllowOrigins:     []string{"https://web.ocra.neojarma.com"},
-	}))
+	// setupService.Group.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	// 	AllowCredentials: true,
+	// 	AllowOrigins:     []string{"https://web.ocra.neojarma.com"},
+	// }))
 
 	router.Router(setupService)
 
-	app.Start(":8080")
+	app.Start(":80")
 }

@@ -38,5 +38,5 @@ func GetFirebaseStorageClient(ctx context.Context) *storage.BucketHandle {
 }
 
 func getFirebaseConfiguration() option.ClientOption {
-	return option.WithCredentialsFile(os.Getenv("FIREBASE_CONFIG_FILE_NAME"))
+	return option.WithCredentialsJSON([]byte(os.Getenv("FIREBASE_CONFIG")))
 }
