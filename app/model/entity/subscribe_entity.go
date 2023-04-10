@@ -1,7 +1,7 @@
 package entity
 
 type Subscribes struct {
-	SubsId    string `json:"subsId"`
+	SubsId    int    `json:"subsId"`
 	ChannelId string `json:"channelId"`
 	UserId    string `json:"userId"`
 }

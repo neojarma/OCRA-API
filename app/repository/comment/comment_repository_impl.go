@@ -43,7 +43,7 @@ func (repository *CommentRepositoryImpl) GetCommentByVideoId(videoId string, off
 }
 
 func (repository *CommentRepositoryImpl) CreateComment(req *entity.Comments) error {
-	err := repository.Db.Create(req).Error
+	err := repository.Db.Omit("comment_id").Create(req).Error
 
 	if err != nil {
 		if helper.IsInvalidForeignKey(err) {

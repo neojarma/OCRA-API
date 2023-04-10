@@ -42,7 +42,7 @@ func (repository *WatchLaterRepositoryImpl) CreateWatchRecord(req *entity.Watch_
 		return errors.New(response.MessageFailedInsertWacthRecord)
 	}
 
-	return repository.Db.Create(req).Error
+	return repository.Db.Omit("watch_id").Create(req).Error
 }
 
 func (repository *WatchLaterRepositoryImpl) GetAllWatchLaterRecord(req *entity.Watch_Laters) ([]*joins_model.WatchLaterJoins, error) {

@@ -31,7 +31,7 @@ func (repository *DislikeRepositoryImpl) IsUserAlreadyDislikeThisVideo(req *enti
 }
 
 func (repository *DislikeRepositoryImpl) CreateDislike(req *entity.Dislikes) error {
-	return repository.Db.Create(req).Error
+	return repository.Db.Omit("dislike_id").Create(req).Error
 }
 
 func (repository *DislikeRepositoryImpl) DeleteDislike(req *entity.Dislikes) error {

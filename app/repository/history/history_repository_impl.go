@@ -43,7 +43,7 @@ func (repository *HistoryRepositoryImpl) CreateHistoryRecord(req *entity.Histori
 		return errors.New(response.MessageFailedInsertWacthRecord)
 	}
 
-	return repository.Db.Create(req).Error
+	return repository.Db.Omit("history_id").Create(req).Error
 }
 
 func (repository *HistoryRepositoryImpl) GetAllHistoryLaterRecord(req *entity.Histories) ([]*joins_model.HistoryJoins, error) {

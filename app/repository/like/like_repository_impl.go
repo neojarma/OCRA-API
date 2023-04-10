@@ -31,7 +31,7 @@ func (repository *LikeRepositoryImpl) IsUserAlreadyLikeThisVideo(req *entity.Lik
 }
 
 func (repository *LikeRepositoryImpl) CreateLike(req *entity.Likes) error {
-	return repository.Db.Create(req).Error
+	return repository.Db.Omit("like_id").Create(req).Error
 }
 
 func (repository *LikeRepositoryImpl) DeleteLike(req *entity.Likes) error {

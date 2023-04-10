@@ -30,7 +30,7 @@ func (repository *SubscribeRepositoryImpl) IsUserSubscribeThisChannel(req *entit
 }
 
 func (repository *SubscribeRepositoryImpl) CreateSubsRecord(req *entity.Subscribes) error {
-	return repository.Db.Create(req).Error
+	return repository.Db.Omit("subs_id").Create(req).Error
 }
 
 func (repository *SubscribeRepositoryImpl) DeleteSubsRecord(req *entity.Subscribes) error {

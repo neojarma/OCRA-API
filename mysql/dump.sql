@@ -40,9 +40,9 @@ CREATE TABLE `channels`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `comments`;
 CREATE TABLE `comments`  (
-  `comment_id` int NOT NULL AUTO_INCREMENT,
+  `comment_id` int(5) NOT NULL AUTO_INCREMENT,
   `video_id` varchar(11) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
-  `channel_id` varchar(22) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `channel_id` varchar(24) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `comment` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `created_at` bigint NOT NULL,
   PRIMARY KEY (`comment_id`) USING BTREE,
@@ -57,7 +57,7 @@ CREATE TABLE `comments`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `dislikes`;
 CREATE TABLE `dislikes`  (
-  `dislike_id` int NOT NULL AUTO_INCREMENT,
+  `dislike_id` int(5) NOT NULL AUTO_INCREMENT,
   `video_id` varchar(11) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `user_id` varchar(22) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   PRIMARY KEY (`dislike_id`) USING BTREE,
@@ -72,7 +72,7 @@ CREATE TABLE `dislikes`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `histories`;
 CREATE TABLE `histories`  (
-  `history_id` int NOT NULL AUTO_INCREMENT,
+  `history_id` int(5) NOT NULL AUTO_INCREMENT,
   `video_id` varchar(11) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `channel_id` varchar(24) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `user_id` varchar(22) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
@@ -90,7 +90,7 @@ CREATE TABLE `histories`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `likes`;
 CREATE TABLE `likes`  (
-  `like_id` int NOT NULL AUTO_INCREMENT,
+  `like_id` int(5) NOT NULL AUTO_INCREMENT,
   `video_id` varchar(11) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `user_id` varchar(22) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   PRIMARY KEY (`like_id`) USING BTREE,
@@ -119,7 +119,7 @@ CREATE TABLE `sessions`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `subscribes`;
 CREATE TABLE `subscribes`  (
-  `subs_id` int NOT NULL AUTO_INCREMENT,
+  `subs_id` int(5) NOT NULL AUTO_INCREMENT,
   `channel_id` varchar(24) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `user_id` varchar(22) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   PRIMARY KEY (`subs_id`) USING BTREE,
@@ -150,7 +150,7 @@ CREATE TABLE `users`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `verifications`;
 CREATE TABLE `verifications`  (
-  `verif_id` int NOT NULL AUTO_INCREMENT,
+  `verif_id` int(5) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `token` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `expires_at` bigint NOT NULL,
@@ -183,7 +183,7 @@ CREATE TABLE `videos`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `watch_laters`;
 CREATE TABLE `watch_laters`  (
-  `watch_id` int NOT NULL AUTO_INCREMENT,
+  `watch_id` int(5) NOT NULL AUTO_INCREMENT,
   `video_id` varchar(11) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `channel_id` varchar(24) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `user_id` varchar(22) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
